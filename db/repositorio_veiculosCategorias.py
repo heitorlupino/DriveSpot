@@ -1,15 +1,15 @@
 from db.conexao import conectar as criar_conexao
 
-def vincular_veiculo_categoria(veiculo_id, categoria_id):
+def vincular_veiculo_categoria(id_veiculo, id_categoria):
     conn = criar_conexao()
     if conn is None:
         return
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO Veiculos_Categorias (veiculo_id, categoria_id)
+            INSERT INTO Veiculos_Categorias (id_veiculo, id_categoria)
             VALUES (%s, %s)
-        """, (veiculo_id, categoria_id))
+        """, (id_veiculo, id_categoria))
         conn.commit()
         print("Veículo vinculado à categoria com sucesso!")
     except Exception as e:
@@ -27,12 +27,12 @@ def listar_vinculos():
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT 
-                VC.id,
+                VC.id_veiculo,
                 V.modelo AS veiculo,
                 C.nome AS categoria
             FROM Veiculos_Categorias VC
-            JOIN Veiculos V ON VC.veiculo_id = V.id
-            JOIN Categorias C ON VC.categoria_id = C.id
+            JOIN Veiculos V ON VC.id_veiculo = V.id_veiculo
+            JOIN Categorias C ON VC.id_categoria = C.id_categoria
         """)
         return cursor.fetchall()
     except Exception as e:

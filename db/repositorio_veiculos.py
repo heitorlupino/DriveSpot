@@ -1,15 +1,15 @@
 from db.conexao import conectar as criar_conexao
 
-def criar_veiculo(modelo, ano, preco, marca_id):
+def criar_veiculo(modelo, ano, preco, id_marca, id_usuario):
     conn = criar_conexao()
     if conn is None:
         return
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO Veiculos (modelo, ano, preco, marca_id)
-            VALUES (%s, %s, %s, %s)
-        """, (modelo, ano, preco, marca_id))
+            INSERT INTO Veiculos (modelo, ano, preco, id_marca, id_usuario)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (modelo, ano, preco, id_marca, id_usuario))
         conn.commit()
         print("Veículo criado com sucesso!")
     except Exception as e:
@@ -26,9 +26,9 @@ def listar_veiculos():
     try:
         cursor = conn.cursor(dictionary=True)
         cursor.execute("""
-            SELECT V.id, V.modelo, V.ano, V.preco, M.nome AS marca
+            SELECT V.id_veiculo, V.modelo, V.ano, V.preco, M.nome AS marca
             FROM Veiculos V
-            JOIN Marcas M ON V.marca_id = M.id
+            JOIN Marcas M ON V.id_marca = M.id_marca
         """)
         return cursor.fetchall()
     except Exception as e:
