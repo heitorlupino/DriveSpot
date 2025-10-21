@@ -23,7 +23,7 @@ def test_criar_e_listar_marca():
     # assert "Fusca" in nomes
     assert "Chevrolet" in nomes
 
-    print("✅ Marca criada e listada com sucesso!")
+    print("Marca criada e listada com sucesso!")
 
 def test_criar_e_listar_veiculo():
     # criar_veiculo("Volkswagen", 1980, 15000, 1, 1)
@@ -37,7 +37,7 @@ def test_criar_e_listar_veiculo():
     # assert "Volkswagen" in modelos
     # assert "Fusca" in modelos
     assert "Onix" in modelos
-    print("✅ Veículo criado e listado com sucesso!")
+    print("Veículo criado e listado com sucesso!")
 
 def test_criar_e_listar_categoria():
     # criar_categoria("SUV")
@@ -51,7 +51,7 @@ def test_criar_e_listar_categoria():
     # assert "SUV" in nomes
     # assert "Sedan" in nomes
     assert "Hatch compacto" in nomes
-    print("✅ Categoria criada e listada com sucesso!")
+    print("Categoria criada e listada com sucesso!")
 
 def test_vincular_e_listar_veiculosCategorias():
     # IDs que você já criou manualmente no banco
@@ -76,9 +76,61 @@ def test_criar_usuario_email_duplicado_try_except():
 
         print("ERRO: O sistema permitiu criar um usuário com email duplicado!")
     except Exception as e:
-        print("Sucesso: o sistema impediu email duplicado.")
+        print("SUCESSO: o sistema impediu email duplicado.")
         print(f"Detalhes do erro: {e}")
 
     usuarios = listar_usuarios()
     emails = [u["email"] for u in usuarios]
     assert emails.count("teste_duplicado@example.com") == 1
+
+def test_criar_marca_invalida():
+    try:
+        criar_marca(None) 
+        print("ERRO: O sistema aceitou uma marca sem nome!")
+        assert False, "Marca inválida foi inserida sem erro!"
+    except Exception as e:
+        print("SUCESSO: o sistema impediu criar uma marca inválida.")
+        print(f"Detalhes do erro: {e}")
+
+    marcas = listar_marcas()
+    nomes = [m["nome"] for m in marcas]
+    assert None not in nomes, "Foi encontrada uma marca com nome None!"
+
+def test_criar_veiculo_invalido():
+
+    criar_veiculo(None, 2020, 50000.0, 9999, 1) 
+
+    veiculos = listar_veiculos()
+    modelos = [v["modelo"] for v in veiculos]
+
+    if None in modelos:
+        print("ERRO: O sistema permitiu criar um veículo com modelo nulo!")
+        assert False, "Veículo inválido foi inserido no banco!"
+    else:
+        print("SUCESSO: o sistema impediu criar veículo com dados inválidos.")
+
+def test_criar_categoria_invalida():
+    try:
+        criar_categoria(None)
+        print("ERRO: o sistema aceitou uma categoria sem nome!")
+        assert False, "Categoria inválida foi inserida sem erro!"
+    except Exception as e:
+        print("SUCESSO: o sistema impediu criar uma categoria com nome NONE!")
+        print(f"Detalher do erro: {e}")
+    
+    categorias = listar_categorias()
+    nomes = [m["nome"] for m in categorias]
+    assert None not in nomes, "Foi encontrado uma categoria com nome NONE!"
+
+def test_criar_veiculosCategoria_invalidos():
+    
+    vincular_veiculo_categoria(909090, 828282)
+
+    vinculos = listar_vinculos()
+
+    for v in vinculos:
+        if v["id_veiculo"] == 909090 or v["categoria"] == 828282:
+            print("ERRO: O sistema permitiu criar um vínculo inválido!")
+            assert False, "Vínculo inválido foi inserido!"
+    
+    print("SUCESSO: o sistema impediu criar vínculo com dados inválidos.")

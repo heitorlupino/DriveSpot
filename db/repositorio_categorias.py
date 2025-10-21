@@ -15,6 +15,7 @@ def criar_categoria(nome):
     except Exception as e:
         conn.rollback()
         print(f"Erro ao inserir categoria: {e}")
+        raise
     finally:
         cursor.close()
         conn.close()

@@ -15,6 +15,7 @@ def criar_marca(nome):
     except Exception as e:
         conn.rollback()
         print(f"Erro ao inserir marca: {e}")
+        raise  
     finally:
         cursor.close()
         conn.close()
