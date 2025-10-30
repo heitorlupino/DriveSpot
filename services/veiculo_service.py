@@ -1,7 +1,7 @@
-from db.conexao import criar_conexao
+from db.conexao import conectar
 
 def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco):
-    conn = criar_conexao()
+    conn = conectar()
     if conn is None:
         return False
 

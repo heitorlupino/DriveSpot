@@ -14,14 +14,15 @@ def test_criar_e_listar_usuario():
 def test_criar_e_listar_marca():
     # criar_marca("Volkswagen")
     # criar_marca("Fusca")
-    criar_marca("Chevrolet")
-    
+    #criar_marca("Chevrolet")
+    criar_marca("Toyota")
     marcas = listar_marcas()
     nomes = [m["nome"] for m in marcas]
     
     # assert "Volkswagen" in nomes
     # assert "Fusca" in nomes
-    assert "Chevrolet" in nomes
+    # assert "Chevrolet" in nomes
+    assert "Toyota" in nomes
 
     print("Marca criada e listada com sucesso!")
 

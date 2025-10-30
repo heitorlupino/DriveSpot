@@ -1,6 +1,6 @@
 import pytest
-from veiculo_service import cadastrar_veiculo
-from db.conexao import criar_conexao
+from services.veiculo_service import cadastrar_veiculo
+from db.conexao import conectar
 
 
 
@@ -8,7 +8,7 @@ def test_cadastrar_veiculo_sucesso():
     resultado = cadastrar_veiculo(1, 1, 2020, "TesteModelo", 50000)
     assert resultado is True
 
-    conn = criar_conexao()
+    conn = conectar()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM Veiculos WHERE modelo=%s AND ano=%s", ("TesteModelo", 2020))
     veiculo = cursor.fetchone()
