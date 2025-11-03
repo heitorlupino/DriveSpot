@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="shortcut icon" href="img/Logo-DriveSpot.ico" type="image/x-icon">
+    <title>Adicionar Veículo</title>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <img src="img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+        </div>
+
+        <nav>
+            <a href="#">Adicionar</a>
+            <a href="#">Editar</a>
+            <a href="#">Remover</a>
+            <a href="#">Relatório</a>
+        </nav>
+        <div class="perfil">
+            <a href="#">Login</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h1>Adicionar Veículo</h1>
+            <form action="/adicionar" method="post">
+                <label>Modelo</label>
+                <input type="text" name="modelo" placeholder="Ex: Corolla" required>
+
+                <div class="linha">
+                    <div class="campo">
+                        <label>Marca</label>
+                        <input type="text" name="marca" placeholder="Ex: Toyota" required>
+                    </div>
+
+                    <div class="campo">
+                        <label>Ano</label>
+                        <input type="number" name="ano" placeholder="Ex: 2023" required>
+                    </div>
+                </div>
+
+                <label>Preço</label>
+                <input type="number" name="preco" placeholder="Ex: 120000" required>
+
+                <button type="submit" class="btn-salvar">Salvar</button>
+
+            </form>
+        </div>
+    </main>
+</body>
+</html> 
