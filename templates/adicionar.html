@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/css/style.css">
-    <link rel="shortcut icon" href="img/Logo-DriveSpot.ico" type="image/x-icon">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
     <title>Adicionar Veículo</title>
 </head>
 <body>
     <header class="navbar">
         <div class="logo">
-            <img src="img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
         </div>
 
         <nav>
@@ -27,6 +27,16 @@
     <main class="container">
         <div class="card">
             <h1>Adicionar Veículo</h1>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <div class="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
             <form action="/adicionar" method="post">
                 <label>Modelo</label>
                 <input type="text" name="modelo" placeholder="Ex: Corolla" required>
