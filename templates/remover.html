@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remover Veículo - DriveSpot</title>
+  <link rel="stylesheet" href="../static/css/styleremover.css">
+  <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">
+      <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+    </div>
+    <nav>
+      <ul>
+        <li><a href="#">Adicionar</a></li>
+        <li><a href="#">Editar</a></li>
+        <li><a href="#" class="active">Remover</a></li>
+        <li><a href="#">Relatório</a></li>
+      </ul>
+      
+    </nav>
+    <div class="perfil">
+            <a href="#">Login</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="card">
+      <h1>Remover Veículo</h1>
+
+      <label for="buscar">Selecione o veículo</label>
+      <div class="search-box">
+        <input type="text" id="buscar" placeholder="Buscar por nome">
+        <button class="search-btn">🔍</button>
+      </div>
+
+      <label for="motivo">Motivo</label>
+      <input type="text" id="motivo" placeholder="Ex: Vendido / Veículo defeituoso">
+
+      <div class="buttons">
+        <button class="btn cancel">Cancelar</button>
+        <button class="btn remove">Remover</button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
