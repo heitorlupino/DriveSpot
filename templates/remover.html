@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
   <link rel="stylesheet" href="../static/css/styleremover.css">
   <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
 </head>
+
 <body>
   <header class="navbar">
     <div class="logo">
@@ -14,30 +16,53 @@
     </div>
     <nav>
       <ul>
-        <li><a href="#">Adicionar</a></li>
+        <li><a href="/adicionar">Adicionar</a></li>
         <li><a href="#">Editar</a></li>
-        <li><a href="#" class="active">Remover</a></li>
+        <li><a href="/remover" class="active">Remover</a></li>
         <li><a href="#">Relatório</a></li>
       </ul>
-      
+
     </nav>
     <div class="perfil">
-            <a href="#">Login</a>
+      <a href="#">Login</a>
     </div>
   </header>
 
   <main class="container">
     <div class="card">
       <h1>Remover Veículo</h1>
+      
+      <form method="POST" action="/remover">
+        <input type="hidden" name="acao" value="pesquisar">
 
-      <label for="buscar">Selecione o veículo</label>
-      <div class="search-box">
-        <input type="text" id="buscar" placeholder="Buscar por nome">
-        <button class="search-btn">🔍</button>
-      </div>
+        <label for="buscar">Selecione o veículo</label>
+        <div class="search-box">
+          <input type="text" name="pesquisa" id="buscar" placeholder="Buscar por modelo / marca / ano"
+            value="{{ pesquisa }}">
+          <button class="search-btn" type="submit">🔍</button>
+        </div>
+      </form>
 
       <label for="motivo">Motivo</label>
       <input type="text" id="motivo" placeholder="Ex: Vendido / Veículo defeituoso">
+
+      {% if resultados %}
+      <div style="margin-top: 20px;">
+        <p><strong>Veículos encontrados: {{ resultados|length }}</strong></p>
+
+        {% for v in resultados %}
+        <form action="/confirmar-remocao/{{ v.id_veiculo }}" method="GET">
+          <button type="submit" class="btn resultado-btn">
+            {{ v.marca }} • {{ v.modelo }} • {{ v.ano }}
+          </button>
+        </form>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if pesquisa and not resultados %}
+      <p style="color: red; margin-top: 20px;">Nenhum veículo encontrado.</p>
+      {% endif %}
 
       <div class="buttons">
         <button class="btn cancel">Cancelar</button>
@@ -46,4 +71,5 @@
     </div>
   </main>
 </body>
+
 </html>

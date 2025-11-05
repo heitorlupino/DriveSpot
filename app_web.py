@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from services.veiculo_service import cadastrar_veiculo
+from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"
@@ -53,6 +53,35 @@ def buscar_id_marca(nome_marca):
     cursor.close()
     conexao.close()
     return id_marca
+
+@app.route('/remover', methods=['GET', 'POST'])
+def remover():
+    pesquisa = request.form.get("pesquisa", "")
+    resultados = []
+
+    if request.method == "POST" and request.form.get("acao") == "pesquisar":
+        resultados = buscar_veiculos_por_texto(pesquisa)
+
+    return render_template("remover.html",
+                           resultados=resultados,
+                           pesquisa=pesquisa)
+
+
+@app.route('/confirmar-remocao/<int:id_veiculo>')
+def confirmar_remocao(id_veiculo):
+    veiculo = buscar_por_id(id_veiculo)
+    if not veiculo:
+        flash("Veículo não encontrado.")
+        return redirect(url_for("remover"))
+    return render_template("confirmar_remocao.html", veiculo=veiculo)
+
+
+@app.route('/remover/<int:id_veiculo>', methods=['POST'])
+def remover_final(id_veiculo):
+    remover_veiculo(id_veiculo)
+    flash("✅ Veículo removido com sucesso!")
+    return redirect(url_for("remover"))
+        
 
 if __name__ == "__main__":
     app.run(debug=True)

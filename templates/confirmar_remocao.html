@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Confirmar Remoção</title>
+  <link rel="stylesheet" href="../static/css/styleremover.css">
+</head>
+
+<body>
+  <main class="container">
+    <div class="card">
+      <h1>Confirmar Remoção</h1>
+
+      <p><strong>Marca:</strong> {{ veiculo.marca }}</p>
+      <p><strong>Modelo:</strong> {{ veiculo.modelo }}</p>
+      <p><strong>Ano:</strong> {{ veiculo.ano }}</p>
+      <p><strong>Preço:</strong> R$ {{ veiculo.preco }}</p>
+
+      <form action="/remover/{{ veiculo.id_veiculo }}" method="POST">
+        <button class="btn remove" type="submit">Remover</button>
+        <a href="/remover" class="btn cancel">Cancelar</a>
+      </form>
+    </div>
+  </main>
+</body>
+</html>
