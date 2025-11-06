@@ -15,9 +15,9 @@
 
     <nav>
       <ul>
-        <li><a href="#">Adicionar</a></li>
-        <li><a href="#" class="active">Editar</a></li>
-        <li><a href="#">Remover</a></li>
+        <li><a href="/adicionar">Adicionar</a></li>
+        <li><a href="/editar" class="active">Editar</a></li>
+        <li><a href="/remover">Remover</a></li>
         <li><a href="#">Relatório</a></li>
       </ul>
     </nav>
@@ -31,16 +31,13 @@
     <div class="card">
       <h1>Editar Veículo</h1>
 
-      <!-- pesquisar veículo -->
       <label for="buscar">Selecione o veículo</label>
       <div class="search-box">
         <input type="text" id="buscar" name="buscar" placeholder="Buscar por nome">
         <button class="search-btn" aria-label="Buscar">🔍</button>
       </div>
 
-      <!-- formulário de edição -->
-      <!-- ajuste action/method conforme rota do back-end -->
-      <form id="editarForm" action="/editar" method="post">
+      <form id="editar" action="/editar/{{ veiculo.id }}" method="post">
         <label for="modelo">Modelo</label>
         <input type="text" id="modelo" name="modelo" placeholder="Ex: Corolla">
 
@@ -60,7 +57,6 @@
         <input type="text" id="preco" name="preco" placeholder="Ex: 120000">
 
         <div class="buttons">
-          <!-- botões: salvar (submit) e cancelar (apenas redireciona) -->
           <button type="submit" class="btn">Salvar</button>
           <button type="button" class="btn cancel" onclick="window.location.href='/'">Cancelar</button>
         </div>

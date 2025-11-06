@@ -79,3 +79,18 @@ def buscar_por_id(id_veiculo):
     cursor.close()
     conexao.close()
     return resultado
+
+def atualizar_veiculo(id_veiculo, id_marca, ano, modelo, preco):
+    conexao = conectar()
+    cursor = conexao.cursor()
+
+    cursor.execute("""
+        UPDATE veiculos
+        SET id_marca = %s, ano = %s, modelo = %s, preco = %s
+        WHERE id_veiculo = %s
+    """, (id_marca, ano, modelo, preco, id_veiculo))
+
+    conexao.commit()
+
+    cursor.close()
+    conexao.close()

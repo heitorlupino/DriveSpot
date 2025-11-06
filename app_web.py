@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id
+from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, atualizar_veiculo
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"
@@ -81,6 +81,39 @@ def remover_final(id_veiculo):
     remover_veiculo(id_veiculo)
     flash("✅ Veículo removido com sucesso!")
     return redirect(url_for("remover"))
+
+@app.route('/editar/<int:id_veiculo>', methods=['GET', 'POST'])
+def editar_veiculo(id_veiculo):
+    veiculo = buscar_por_id(id_veiculo)
+
+    if not veiculo:
+        flash("❌ Veículo não encontrado!")
+        return redirect('/')
+
+    if request.method == 'POST':
+        modelo = request.form['modelo']
+        marca = request.form['marca']
+        ano = int(request.form['ano'])
+        preco = float(request.form['preco'])
+
+        id_marca = buscar_id_marca(marca) 
+
+        try:
+            atualizar_veiculo(id_veiculo, id_marca, ano, modelo, preco)
+            flash("✅ Veículo atualizado com sucesso!")
+            return redirect('/')  
+        except Exception as e:
+            flash(f"❌ Erro ao atualizar veículo: {e}")
+
+
+    return render_template('editar.html', veiculo=veiculo)
+
+@app.route('/editar')
+def escolher_veiculo_editar():
+    # essa tela abre vazia, igual você quer
+    return render_template('editar.html', veiculo=None)
+
+
         
 
 if __name__ == "__main__":
