@@ -36,23 +36,32 @@ def buscar_id_marca(nome_marca):
     from db.conexao import conectar as obter_conexao
 
     conexao = obter_conexao()
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(buffered=True)  # <-- evita o erro de unread result
 
-  
-    cursor.execute("SELECT id_marca FROM marcas WHERE nome = %s", (nome_marca,))
-    resultado = cursor.fetchone()
+    try:
+        # Verifica se a marca já existe
+        cursor.execute("SELECT id_marca FROM marcas WHERE nome = %s", (nome_marca,))
+        resultado = cursor.fetchone()
 
-    if resultado:
-        id_marca = resultado[0]
-    else:
-        
-        cursor.execute("INSERT INTO marcas (nome) VALUES (%s)", (nome_marca,))
-        conexao.commit()
-        id_marca = cursor.lastrowid
+        if resultado:
+            id_marca = resultado[0]
+        else:
+            # Insere nova marca se não existir
+            cursor.execute("INSERT INTO marcas (nome) VALUES (%s)", (nome_marca,))
+            conexao.commit()
+            id_marca = cursor.lastrowid
 
-    cursor.close()
-    conexao.close()
-    return id_marca
+        return id_marca
+
+    except mysql.connector.Error as erro:
+        print(f"Erro ao buscar ou inserir marca: {erro}")
+        conexao.rollback()
+        return None
+
+    finally:
+        cursor.close()
+        conexao.close()
+
 
 @app.route('/remover', methods=['GET', 'POST'])
 def remover():
