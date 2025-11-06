@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
-from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, atualizar_veiculo
+from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"
 
 @app.route('/')
 def index():
-    # Redireciona para a página de adicionar veículo
+    
     return render_template('adicionar.html')
 
 
@@ -18,9 +18,9 @@ def adicionar_veiculo():
         ano = int(request.form['ano'])
         preco = float(request.form['preco'])
 
-        # IDs automáticos (exemplo)
-        id_usuario = 1  # o usuário logado, futuramente isso virá da sessão
-        id_marca = buscar_id_marca(marca)  # função que encontra ou cria a marca
+        
+        id_usuario = 1  
+        id_marca = buscar_id_marca(marca)  
 
         try:
             cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco)
@@ -38,14 +38,14 @@ def buscar_id_marca(nome_marca):
     conexao = obter_conexao()
     cursor = conexao.cursor()
 
-    # Verifica se a marca já existe
+  
     cursor.execute("SELECT id_marca FROM marcas WHERE nome = %s", (nome_marca,))
     resultado = cursor.fetchone()
 
     if resultado:
         id_marca = resultado[0]
     else:
-        # Cria a marca se não existir
+        
         cursor.execute("INSERT INTO marcas (nome) VALUES (%s)", (nome_marca,))
         conexao.commit()
         id_marca = cursor.lastrowid
@@ -82,39 +82,38 @@ def remover_final(id_veiculo):
     flash("✅ Veículo removido com sucesso!")
     return redirect(url_for("remover"))
 
-@app.route('/editar/<int:id_veiculo>', methods=['GET', 'POST'])
-def editar_veiculo(id_veiculo):
-    veiculo = buscar_por_id(id_veiculo)
+@app.route("/editar", methods=["GET", "POST"])
+def editar():
+    veiculo = None
+    mensagem = ""
 
-    if not veiculo:
-        flash("❌ Veículo não encontrado!")
-        return redirect('/')
+    if request.method == "POST":
 
-    if request.method == 'POST':
-        modelo = request.form['modelo']
-        marca = request.form['marca']
-        ano = int(request.form['ano'])
-        preco = float(request.form['preco'])
+        # --- PESQUISAR ---
+        if "pesquisar" in request.form:
+            termo = request.form.get("pesquisa")
+            veiculo = buscar_veiculo_exato(termo)
 
-        id_marca = buscar_id_marca(marca) 
+            if not veiculo:
+                mensagem = "❌ Nenhum veículo encontrado com esse modelo."
 
-        try:
-            atualizar_veiculo(id_veiculo, id_marca, ano, modelo, preco)
-            flash("✅ Veículo atualizado com sucesso!")
-            return redirect('/')  
-        except Exception as e:
-            flash(f"❌ Erro ao atualizar veículo: {e}")
+        # --- SALVAR ALTERAÇÕES ---
+        elif "salvar" in request.form:
+            id_veiculo = request.form.get("id_veiculo")
+            modelo = request.form.get("modelo")
+            marca = request.form.get("marca")
+            ano = request.form.get("ano")
+            preco = request.form.get("preco")
+
+            atualizar_veiculo(id_veiculo, modelo, marca, ano, preco)
+            mensagem = "✅ Veículo atualizado com sucesso!"
+
+            # Recarrega os dados atualizados
+            veiculo = buscar_por_id(id_veiculo)
+
+    return render_template("editar.html", veiculo=veiculo, mensagem=mensagem)
 
 
-    return render_template('editar.html', veiculo=veiculo)
-
-@app.route('/editar')
-def escolher_veiculo_editar():
-    # essa tela abre vazia, igual você quer
-    return render_template('editar.html', veiculo=None)
-
-
-        
 
 if __name__ == "__main__":
     app.run(debug=True)

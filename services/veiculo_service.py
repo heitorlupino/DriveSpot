@@ -80,16 +80,50 @@ def buscar_por_id(id_veiculo):
     conexao.close()
     return resultado
 
-def atualizar_veiculo(id_veiculo, id_marca, ano, modelo, preco):
+def buscar_veiculo_exato(nome):
+    conexao = conectar()
+    cursor = conexao.cursor(dictionary=True, buffered=True)
+
+    try:
+        partes = nome.split()
+
+        sql = """
+            SELECT v.id_veiculo, v.modelo, m.nome AS marca, v.ano, v.preco
+            FROM veiculos v
+            INNER JOIN marcas m ON v.id_marca = m.id_marca
+            WHERE CONCAT(m.nome, ' ', v.modelo, ' ', v.ano) LIKE %s
+        """
+
+        nome_busca = f"%{' '.join(partes)}%"
+        cursor.execute(sql, (nome_busca,))
+        veiculo = cursor.fetchone()
+
+        return veiculo
+
+    finally:
+        cursor.close()
+        conexao.close()
+
+def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco):
     conexao = conectar()
     cursor = conexao.cursor()
 
-    cursor.execute("""
-        UPDATE veiculos
-        SET id_marca = %s, ano = %s, modelo = %s, preco = %s
-        WHERE id_veiculo = %s
-    """, (id_marca, ano, modelo, preco, id_veiculo))
+    # Buscar o id_marca correspondente ao nome da marca
+    cursor.execute("SELECT id_marca FROM marcas WHERE nome = %s", (nome_marca,))
+    resultado = cursor.fetchone()
 
+    if not resultado:
+        raise ValueError(f"Marca '{nome_marca}' não encontrada no banco de dados.")
+
+    id_marca = resultado[0]
+
+    # Atualizar o veículo com o id_marca correto
+    query = """
+        UPDATE veiculos
+        SET modelo = %s, id_marca = %s, ano = %s, preco = %s
+        WHERE id_veiculo = %s
+    """
+    cursor.execute(query, (modelo, id_marca, ano, preco, id_veiculo))
     conexao.commit()
 
     cursor.close()
