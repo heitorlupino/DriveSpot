@@ -1,0 +1,116 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Fundo e centralização */
+body {
+    background-color: #1D18B1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+/* Botão Voltar */
+.btn-voltar {
+    align-self: flex-start;
+    margin-left: 20px;
+    background-color: white;
+    color: #1D18B1;
+    font-weight: bold;
+    font-size: 18px;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    cursor: pointer;
+    transition: 0.2s;
+    transform: translateY(-21px);
+}
+
+.btn-voltar:hover {
+    background-color: #e6e6e6;
+}
+
+/* Container principal */
+.cadastro-container {
+    text-align: center;
+    color: white;
+    width: 400px;
+    margin-top: 0px;
+    transform: translateY(-40px);
+}
+
+/* Logo */
+.logo img {
+    width: 400px;
+    margin-bottom: 0px;
+    transform: translateY(-40px);
+}
+
+/* Título "Cadastro" */
+h2 {
+    font-size: 22px;
+    margin-top: 0px;
+    margin-bottom: 20px;
+    transform: translateY(-40px);
+}
+
+/* Inputs */
+form input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transform: translateY(-40px);
+}
+
+/* Botões de ação */
+.botoes {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    transform: translateY(-40px);
+}
+
+.botoes button {
+    width: 48%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+/* Botão cancelar */
+.cancelar {
+    background-color: white;
+    color: #1D18B1;
+}
+
+.cancelar:hover {
+    background-color: #ddd;
+}
+
+/* Botão salvar */
+.salvar {
+    background-color: white;
+    color: #1D18B1;
+}
+
+.salvar:hover {
+    background-color: #ddd;
+}
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
