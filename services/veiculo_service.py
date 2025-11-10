@@ -1,4 +1,34 @@
 from db.conexao import conectar
+from werkzeug.security import generate_password_hash
+
+def cadastrar_usuario(nome, email, senha):
+    conexao = conectar()
+    if conexao is None:
+        return False
+
+    try:
+        cursor = conexao.cursor()
+
+        # Criptografar a senha antes de salvar
+        senha_hash = generate_password_hash(senha)
+
+        cursor.execute("""
+            INSERT INTO Usuarios (nome, email, senha_hash)
+            VALUES (%s, %s, %s)
+        """, (nome, email, senha_hash))
+        
+        conexao.commit()
+        print("Usuário cadastrado com sucesso!")
+        return True
+
+    except Exception as e:
+        print(f"Erro ao cadastrar usuário: {e}")
+        conexao.rollback()
+        return False
+
+    finally:
+        cursor.close()
+        conexao.close()
 
 def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco):
     conn = conectar()

@@ -20,7 +20,12 @@
             <a href="#">Relatório</a>
         </nav>
         <div class="perfil">
-            <a href="#">Login</a>
+            {% if session.get('usuario_nome') %}
+            <span class="usuario-nome">👤 Olá, {{ session['usuario_nome'] }}</span>
+            <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+        {% else %}
+            <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+        {% endif %}
         </div>
     </header>
 

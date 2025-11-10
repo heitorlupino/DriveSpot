@@ -15,13 +15,13 @@
 
         <h2>Login</h2>
 
-        <form>
-            <input type="email" placeholder="Email" required>
-            <input type="password" placeholder="Senha" required>
+        <form method="post">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="senha" placeholder="Senha" required>
 
             <p class="register-text">
                 Não tem uma conta? 
-                <a href="#" class="register-link">Registre-se</a>
+                <a href="/cadastro" class="register-link">Registre-se</a>
             </p>
 
             <button type="submit">Entrar</button>
