@@ -192,4 +192,10 @@ input[type="number"] {
   font-weight: bold;
 }
 
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+
 

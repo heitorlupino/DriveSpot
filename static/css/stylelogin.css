@@ -85,3 +85,8 @@ button {
 button:hover {
     background-color: #e7e7e7;
 }
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}

@@ -161,3 +161,8 @@ input:focus{
 .btn-salvar:hover{
     background-color: #15158C;
 }
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
