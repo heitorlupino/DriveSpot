@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db.conexao import conectar as obter_conexao
-from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario
+from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
 
 
 app = Flask(__name__)
@@ -204,6 +204,16 @@ def editar():
 
     return render_template("editar.html", veiculo=veiculo, mensagem=mensagem)
 
+@app.route('/relatorio', methods=['GET', 'POST'])
+def relatorio():
+    dados = None
+
+
+    if request.method == 'POST':
+        termo = request.form.get('termo')
+        dados = gerar_relatorio(termo)
+
+    return render_template('relatorio.html', dados=dados)
 
 
 if __name__ == "__main__":

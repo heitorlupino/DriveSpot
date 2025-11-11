@@ -158,3 +158,43 @@ def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco):
 
     cursor.close()
     conexao.close()
+
+def gerar_relatorio(termo):
+    conexao = conectar()
+    cursor = conexao.cursor(dictionary=True)
+
+    try:
+        cursor.execute("SELECT COUNT(*) AS qtd FROM veiculos WHERE modelo = %s", (termo,))
+        eh_modelo = cursor.fetchone()['qtd'] > 0
+
+        if eh_modelo:
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) AS quantidade,
+                    AVG(v.preco) AS media_preco,
+                    MAX(v.preco) AS maior_preco,
+                    MIN(v.preco) AS menor_preco,
+                    m.nome AS marca
+                FROM veiculos v
+                JOIN marcas m ON v.id_marca = m.id_marca
+                WHERE v.modelo = %s
+            """, (termo,))
+        else:
+            cursor.execute("""
+                SELECT 
+                    COUNT(*) AS quantidade,
+                    AVG(v.preco) AS media_preco,
+                    MAX(v.preco) AS maior_preco,
+                    MIN(v.preco) AS menor_preco,
+                    m.nome AS marca
+                FROM veiculos v
+                JOIN marcas m ON v.id_marca = m.id_marca
+                WHERE m.nome = %s
+            """, (termo,))
+
+        return cursor.fetchone()
+
+    finally:
+        cursor.close()
+        conexao.close()
+
