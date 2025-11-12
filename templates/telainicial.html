@@ -14,14 +14,19 @@
             <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo DriveSpot">
         </div>
         <ul class="nav-links">
-            <a href="#">Adicionar</a>
-            <a href="#">Editar</a>
-            <a href="#">Remover</a>
-            <a href="#">Relatórios</a>
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
         </ul>
        <div class="perfil">
-      <a href="/login">Login</a>
-       </div>
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
     </nav>
 
     <!-- Imagem principal -->

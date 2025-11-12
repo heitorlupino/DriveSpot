@@ -24,8 +24,13 @@
 
     </nav>
     <div class="perfil">
-      <a href="/login">Login</a>
-    </div>
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
   </header>
 
   <main class="container">

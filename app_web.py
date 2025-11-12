@@ -1,15 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 from db.conexao import conectar as obter_conexao
 from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
-
+from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"
 
+def login_obrigatorio(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "usuario" not in session:
+            flash("Você precisa fazer login para acessar essa página.")
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+@app.context_processor
+def inject_user():
+    return dict(session=session)
+
 @app.route('/')
 def index():
-    
-    return render_template('adicionar.html')
+    if "usuario" in session:
+        return redirect(url_for("tela_inicial"))
+    return redirect(url_for("login"))
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
@@ -30,7 +44,7 @@ def cadastro():
 
         try:
             conexao = obter_conexao()
-            cursor = conexao.cursor()
+            cursor = conexao.cursor(dictionary=True)
 
             cursor.execute("SELECT id_usuario FROM Usuarios WHERE email = %s", (email,))
             if cursor.fetchone():
@@ -70,8 +84,11 @@ def login():
             usuario = cursor.fetchone()
 
             if usuario and usuario["senha_hash"] == senha:
-                session["usuario_nome"] = usuario["nome"]
-                return redirect(url_for("index"))
+                session["usuario"] = {
+                    "id": usuario["id_usuario"],
+                    "nome": usuario["nome"]
+                }
+                return redirect(url_for("tela_inicial"))
             else:
                 flash("E-mail ou senha incorretos.")
                 return render_template("login.html")
@@ -88,13 +105,31 @@ def login():
 
 @app.route("/logout")
 def logout():
-    session.pop("usuario_nome", None)
+    session.pop("usuario", None)
     return redirect(url_for("login"))
+
+@app.route("/telaInicial", methods=["GET", "POST"])
+@login_obrigatorio
+def tela_inicial():
+    nome_usuario = session["usuario"]["nome"]
+    resultados = []
+
+    if request.method == "POST":
+        termo_pesquisa = request.form.get("pesquisa", "").strip()
+        if termo_pesquisa:
+            try:
+                resultados = buscar_veiculos_por_texto(termo_pesquisa)
+            except Exception as e:
+                flash(f"Erro ao buscar veículos: {e}")
+
+    return render_template("telaInicial.html", nome_usuario=nome_usuario, resultados=resultados)
 
 
 
 @app.route('/adicionar', methods=['GET', 'POST'])
+@login_obrigatorio
 def adicionar_veiculo():
+    
     if request.method == 'POST':
         modelo = request.form['modelo']
         marca = request.form['marca']
@@ -102,7 +137,7 @@ def adicionar_veiculo():
         preco = float(request.form['preco'])
 
         
-        id_usuario = 1  
+        id_usuario = session["usuario"]["id"] 
         id_marca = buscar_id_marca(marca)  
 
         try:
@@ -146,6 +181,7 @@ def buscar_id_marca(nome_marca):
 
 
 @app.route('/remover', methods=['GET', 'POST'])
+@login_obrigatorio
 def remover():
     pesquisa = request.form.get("pesquisa", "")
     resultados = []
@@ -159,6 +195,7 @@ def remover():
 
 
 @app.route('/confirmar-remocao/<int:id_veiculo>')
+@login_obrigatorio
 def confirmar_remocao(id_veiculo):
     veiculo = buscar_por_id(id_veiculo)
     if not veiculo:
@@ -168,12 +205,14 @@ def confirmar_remocao(id_veiculo):
 
 
 @app.route('/remover/<int:id_veiculo>', methods=['POST'])
+@login_obrigatorio
 def remover_final(id_veiculo):
     remover_veiculo(id_veiculo)
     flash("Veículo removido com sucesso!")
     return redirect(url_for("remover"))
 
 @app.route("/editar", methods=["GET", "POST"])
+@login_obrigatorio
 def editar():
     veiculo = None
     mensagem = ""
@@ -205,6 +244,7 @@ def editar():
     return render_template("editar.html", veiculo=veiculo, mensagem=mensagem)
 
 @app.route('/relatorio', methods=['GET', 'POST'])
+@login_obrigatorio
 def relatorio():
     dados = None
 
