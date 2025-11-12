@@ -26,25 +26,30 @@
 
     <!-- Imagem principal -->
     <section class="banner">
-        <img src="../static/img/bannercarro.jpeg" alt="Imagem de carros">
+        <img src="../static/img/Tela_de_fundo_DriveSpot.png" alt="Imagem de carros">
     </section>
 
     <!-- Campo de busca -->
-    <section class="search-section">
-        <input type="text" placeholder="Buscar por nome">
-        <button><i class="search-icon">🔍</i></button>
-    </section>
+    <div class="container">
+        <form method="POST" action="/telaInicial" class="search-form">
+            <div class="search-box">
+                <input type="text" id="pesquisa" name="pesquisa" placeholder="Ex: Corolla"
+                    value="{{ request.form.pesquisa if request.form.pesquisa else '' }}">
+                <button type="submit" class="search-btn" name="pesquisar" aria-label="Buscar">🔍</button>
+            </div>
+        </form>
+    </div>
 
     <!-- Cards de carros -->
     <section class="car-section">
         <h2>Carros</h2>
         <div class="car-grid">
-            <div class="car-card">Marca 1</div>
-            <div class="car-card">Marca 2</div>
-            <div class="car-card">Marca 3</div>
-            <div class="car-card">Marca 4</div>
-            <div class="car-card">Marca 5</div>
-            <div class="car-card">Marca 6</div>
+            <div class="car-card"><a href="#">Marca 1</a></div>
+            <div class="car-card"><a href="#">Marca 2</a></div>
+            <div class="car-card"><a href="#">Marca 3</a></div>
+            <div class="car-card"><a href="#">Marca 4</a></div>
+            <div class="car-card"><a href="#">Marca 5</a></div>
+            <div class="car-card"><a href="#">Marca 6</a></div>
         </div>
     </section>
 </body>

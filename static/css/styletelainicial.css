@@ -6,6 +6,10 @@
     font-family: Arial, Helvetica, sans-serif;
 }
 
+body{
+    background-color: #EAEAEA;
+}
+
 /* Navbar */
 .navbar{
     background-color: #1D18B1;
@@ -67,35 +71,65 @@ nav a:focus{
 /* Banner */
 .banner img {
     width: 100%;
-    height: 180px;
+    height: 300px;
     object-fit: cover;
 }
 
-/* Campo de busca */
-.search-section {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 15px;
-    background-color: #EAEAEA;
+/* === Campo de busca === */
+.container {
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 0 20px;
 }
 
-.search-section input {
-    width: 300px;
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    outline: none;
-    font-size: 14px;
+.search-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.search-section button {
-    margin-left: 6px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
+.search-form label {
+  font-weight: 500;
+  margin-bottom: 8px;
+  color: #333;
 }
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: #f3f3f3;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  padding: 5px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.search-box input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 10px 14px;
+  font-size: 16px;
+  color: #333;
+}
+
+.search-box button {
+  background-color: #d9d9d9;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-box button:hover {
+  background-color: #15108A;
+}
+
 
 /* Cards de carros */
 .car-section {
@@ -105,6 +139,7 @@ nav a:focus{
 }
 
 .car-section h2 {
+    font-size: 20px;
     margin-bottom: 20px;
 }
 
@@ -117,17 +152,23 @@ nav a:focus{
 
 .car-card {
     background-color: #1D18B1;
-    color: white;
     padding: 70px 0;
-    width: 180px;
     text-align: center;
+    width: 180px;
     border-radius: 8px;
-    font-weight: bold;
     transition: 0.3s;
+}
+
+.car-card a{
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    text-decoration: none;
 }
 
 .car-card:hover {
     transform: scale(1.05);
+    cursor: pointer;
 }
 
 
