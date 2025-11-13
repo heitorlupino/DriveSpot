@@ -3,31 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="../static/css/styleRelatorio.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+    <title>Relatório de Veículos</title>
 </head>
 <body>
-    <div class="container" style="margin-top: 40px; text-align: center;">
 
-    <h2>Relatório de Veículos</h2>
+    <header class="navbar">
+        <div class="logo">
+            <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+        </div>
 
-    <form method="POST" style="margin-top: 20px;">
-        <input type="text" name="termo" placeholder="Digite o modelo ou a marca"
-               style="padding: 8px; width: 260px; border-radius: 6px; border: 1px solid #aaa;">
-        <button type="submit" style="padding: 8px 16px; border-radius: 6px; cursor: pointer;">
-            Gerar Relatório
-        </button>
-    </form>
+        <nav>
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </nav>
+        <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </header>
 
-    {% if dados %}
-    <div style="margin-top: 30px; text-align: left; display: inline-block;">
-        <p><strong>Marca:</strong> {{ dados.marca }}</p>
-        <p><strong>Quantidade de veículos:</strong> {{ dados.quantidade }}</p>
-        <p><strong>Preço médio:</strong> R$ {{ "%.2f"|format(dados.media_preco) }}</p>
-        <p><strong>Maior preço:</strong> R$ {{ "%.2f"|format(dados.maior_preco) }}</p>
-        <p><strong>Menor preço:</strong> R$ {{ "%.2f"|format(dados.menor_preco) }}</p>
+    <main class="container">
+    <div class="card">
+        <h1>Relatório de Veículos</h1>
+        <form action="/relatorio" method="post">
+
+            <label>Marca:</label>
+            <select name="marca">
+                <option value="">Todas</option>
+                <option value="Chevrolet">Chevrolet</option>
+                <option value="Hyundai">Hyundai</option>
+                <option value="Volkswagen">Volkswagen</option>
+                <option value="Toyota">Toyota</option>
+            </select>
+
+            <div class="linha">
+                <div class="campo">
+                    <label>Ano mínimo</label>
+                    <input type="number" name="ano_min" placeholder="Ex: 2020">
+                </div>
+
+                <div class="campo">
+                    <label>Ano máximo</label>
+                    <input type="number" name="ano_max" placeholder="Ex: 2023">
+                </div>
+            </div>
+
+            <label>Preço máximo</label>
+            <input type="number" name="preco_max" placeholder="Ex: 120000">
+
+            <button type="submit" class="btn-gerar_relatorio">Gerar Relatório</button>
+        </form>
+
+        {% if dados %}
+        <div class="relatorio">
+            <h3>Resumo dos veículos</h3>
+            <p><strong>Total de veículos:</strong> {{ dados.total }}</p>
+            <p><strong>Média de preço:</strong> R$ {{ dados.media_preco }}</p>
+            <p><strong>Marca mais comum:</strong> {{ dados.marca_comum }}</p>
+            <p><strong>Ano mais frequente:</strong> {{ dados.ano_frequente }}</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Ano</th>
+                        <th>Preço</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in dados.veiculos %}
+                    <tr>
+                        <td>{{ v.modelo }}</td>
+                        <td>{{ v.marca }}</td>
+                        <td>{{ v.ano }}</td>
+                        <td>R$ {{ v.preco }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
     </div>
-    {% endif %}
-
+</main>
 </div>
 
 </body>
