@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, get_flashed_messages
 from db.conexao import conectar as obter_conexao
 from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
 from functools import wraps
@@ -126,6 +126,8 @@ def tela_inicial():
 @app.route('/adicionar', methods=['GET', 'POST'])
 @login_obrigatorio
 def adicionar_veiculo():
+
+    get_flashed_messages()
     
     if request.method == 'POST':
         modelo = request.form['modelo']
@@ -139,10 +141,12 @@ def adicionar_veiculo():
 
         try:
             cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco)
-            flash("Veículo cadastrado com sucesso!")
+            flash("Veículo cadastrado com sucesso!", "adicionar")
         except Exception as e:
             flash(f"Erro ao cadastrar veículo: {e}")
-        
+            
+        return redirect(url_for('adicionar_veiculo'))
+    
     return render_template('adicionar.html')
 
 
@@ -205,7 +209,7 @@ def confirmar_remocao(id_veiculo):
 @login_obrigatorio
 def remover_final(id_veiculo):
     remover_veiculo(id_veiculo)
-    flash("Veículo removido com sucesso!")
+    flash("Veículo removido com sucesso!", "remover")
     return redirect(url_for("remover"))
 
 @app.route("/editar", methods=["GET", "POST"])

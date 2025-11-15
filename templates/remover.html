@@ -10,20 +10,19 @@
 </head>
 
 <body>
-  <header class="navbar">
-    <div class="logo">
-      <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
-    </div>
-    <nav>
-      <ul>
-        <li><a href="/adicionar">Adicionar</a></li>
-        <li><a href="/editar">Editar</a></li>
-        <li><a href="/remover" class="active">Remover</a></li>
-        <li><a href="/relatorio">Relatório</a></li>
-      </ul>
-
-    </nav>
-    <div class="perfil">
+  <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
             {% if session.usuario %}
                 <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
                 <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
@@ -31,7 +30,7 @@
                 <a href="{{ url_for('login') }}" class="btn-login">Login</a>
             {% endif %}
         </div>
-  </header>
+    </nav>
 
   <main class="container">
     <div class="card">
@@ -40,6 +39,14 @@
       <form method="POST" action="/remover">
         <input type="hidden" name="acao" value="pesquisar">
 
+        {% with messages = get_flashed_messages(category_filter=["remover"]) %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="alert">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
         <label for="buscar">Selecione o veículo</label>
         <div class="search-box">
           <input type="text" name="pesquisa" id="buscar" placeholder="Buscar por modelo / marca / ano"
@@ -47,9 +54,6 @@
           <button class="search-btn" type="submit">🔍</button>
         </div>
       </form>
-
-      <label for="motivo">Motivo</label>
-      <input type="text" id="motivo" placeholder="Ex: Vendido / Veículo defeituoso">
 
       {% if resultados %}
       <div style="margin-top: 20px;">

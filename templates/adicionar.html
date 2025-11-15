@@ -8,18 +8,19 @@
     <title>Adicionar Veículo</title>
 </head>
 <body>
-    <header class="navbar">
+    <nav class="navbar">
         <div class="logo">
-            <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
         </div>
-
-        <nav>
+        <ul class="nav-links">
             <a href="/adicionar">Adicionar</a>
             <a href="/editar">Editar</a>
             <a href="/remover">Remover</a>
             <a href="/relatorio">Relatório</a>
-        </nav>
-        <div class="perfil">
+        </ul>
+       <div class="perfil">
             {% if session.usuario %}
                 <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
                 <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
@@ -27,12 +28,12 @@
                 <a href="{{ url_for('login') }}" class="btn-login">Login</a>
             {% endif %}
         </div>
-    </header>
+    </nav>
 
     <main class="container">
         <div class="card">
             <h1>Adicionar Veículo</h1>
-            {% with messages = get_flashed_messages() %}
+            {% with messages = get_flashed_messages(category_filter=["adicionar"]) %}
                 {% if messages %}
                     <div class="alert">
                         {% for message in messages %}
