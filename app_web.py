@@ -249,12 +249,38 @@ def editar():
 def relatorio():
     dados = None
 
+    conexao = obter_conexao()
+    cursor = conexao.cursor()
 
-    if request.method == 'POST':
-        termo = request.form.get('termo')
-        dados = gerar_relatorio(termo)
+    cursor.execute("""
+        SELECT DISTINCT m.nome 
+        FROM marcas m
+        JOIN veiculos v ON v.id_marca = m.id_marca
+        ORDER BY m.nome ASC
+    """)
+    
+    marcas = [row[0] for row in cursor.fetchall()]
 
-    return render_template('relatorio.html', dados=dados)
+    if request.method == "POST":
+        marca = request.form.get("marca", "")
+        ano_min = request.form.get("ano_min", "")
+        ano_max = request.form.get("ano_max", "")
+        preco_max = request.form.get("preco_max", "")
+
+        filtros = {
+            "marca": marca if marca else None,
+            "ano_min": int(ano_min) if ano_min else None,
+            "ano_max": int(ano_max) if ano_max else None,
+            "preco_max": float(preco_max) if preco_max else None
+        }
+
+        try:
+            dados = gerar_relatorio(filtros)
+        except Exception as e:
+            flash(f"Erro ao gerar relatório: {e}", category="relatorio")
+
+    return render_template("relatorio.html", dados=dados, marcas=marcas)
+
 
 @app.before_request
 def limpar_sessao_ao_iniciar():

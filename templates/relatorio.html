@@ -39,10 +39,9 @@
             <label>Marca:</label>
             <select name="marca">
                 <option value="">Todas</option>
-                <option value="Chevrolet">Chevrolet</option>
-                <option value="Hyundai">Hyundai</option>
-                <option value="Volkswagen">Volkswagen</option>
-                <option value="Toyota">Toyota</option>
+                {% for m in marcas %}
+                    <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
             </select>
 
             <div class="linha">

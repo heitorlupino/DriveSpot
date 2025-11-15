@@ -1,5 +1,6 @@
 from db.conexao import conectar
 from werkzeug.security import generate_password_hash
+from collections import Counter
 
 def cadastrar_usuario(nome, email, senha):
     conexao = conectar()
@@ -159,42 +160,54 @@ def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco):
     cursor.close()
     conexao.close()
 
-def gerar_relatorio(termo):
+def gerar_relatorio(filtros):
     conexao = conectar()
     cursor = conexao.cursor(dictionary=True)
 
-    try:
-        cursor.execute("SELECT COUNT(*) AS qtd FROM veiculos WHERE modelo = %s", (termo,))
-        eh_modelo = cursor.fetchone()['qtd'] > 0
+    query = """
+        SELECT v.modelo, m.nome AS marca, v.ano, v.preco
+        FROM Veiculos v
+        INNER JOIN Marcas m ON v.id_marca = m.id_marca
+        WHERE 1=1
+    """
+    valores = []
 
-        if eh_modelo:
-            cursor.execute("""
-                SELECT 
-                    COUNT(*) AS quantidade,
-                    AVG(v.preco) AS media_preco,
-                    MAX(v.preco) AS maior_preco,
-                    MIN(v.preco) AS menor_preco,
-                    m.nome AS marca
-                FROM veiculos v
-                JOIN marcas m ON v.id_marca = m.id_marca
-                WHERE v.modelo = %s
-            """, (termo,))
-        else:
-            cursor.execute("""
-                SELECT 
-                    COUNT(*) AS quantidade,
-                    AVG(v.preco) AS media_preco,
-                    MAX(v.preco) AS maior_preco,
-                    MIN(v.preco) AS menor_preco,
-                    m.nome AS marca
-                FROM veiculos v
-                JOIN marcas m ON v.id_marca = m.id_marca
-                WHERE m.nome = %s
-            """, (termo,))
+    if filtros["marca"]:
+        query += " AND m.nome = %s"
+        valores.append(filtros["marca"])
 
-        return cursor.fetchone()
+    if filtros["ano_min"]:
+        query += " AND v.ano >= %s"
+        valores.append(filtros["ano_min"])
 
-    finally:
-        cursor.close()
-        conexao.close()
+    if filtros["ano_max"]:
+        query += " AND v.ano <= %s"
+        valores.append(filtros["ano_max"])
+
+    if filtros["preco_max"]:
+        query += " AND v.preco <= %s"
+        valores.append(filtros["preco_max"])
+
+    cursor.execute(query, valores)
+    veiculos = cursor.fetchall()
+
+    if not veiculos:
+        return None
+
+    # Estatísticas
+    total = len(veiculos)
+    media_preco = sum(v["preco"] for v in veiculos) / total
+    marca_comum = Counter(v["marca"] for v in veiculos).most_common(1)[0][0]
+    ano_frequente = Counter(v["ano"] for v in veiculos).most_common(1)[0][0]
+
+    cursor.close()
+    conexao.close()
+
+    return {
+        "total": total,
+        "media_preco": round(media_preco, 2),
+        "marca_comum": marca_comum,
+        "ano_frequente": ano_frequente,
+        "veiculos": veiculos
+    }
 
