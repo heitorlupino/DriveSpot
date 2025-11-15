@@ -21,9 +21,7 @@ def inject_user():
 
 @app.route('/')
 def index():
-    if "usuario" in session:
-        return redirect(url_for("tela_inicial"))
-    return redirect(url_for("login"))
+    return redirect(url_for("tela_inicial"))
 
 @app.route("/cadastro", methods=["GET", "POST"])
 def cadastro():
@@ -109,9 +107,8 @@ def logout():
     return redirect(url_for("login"))
 
 @app.route("/telaInicial", methods=["GET", "POST"])
-@login_obrigatorio
 def tela_inicial():
-    nome_usuario = session["usuario"]["nome"]
+    nome_usuario = session["usuario"]["nome"] if "usuario" in session else None
     resultados = []
 
     if request.method == "POST":
@@ -255,6 +252,11 @@ def relatorio():
 
     return render_template('relatorio.html', dados=dados)
 
+@app.before_request
+def limpar_sessao_ao_iniciar():
+    if app.debug and "sessao_limpa" not in session:
+        session.clear()
+        session["sessao_limpa"] = True
 
 if __name__ == "__main__":
     app.run(debug=True)
