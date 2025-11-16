@@ -127,7 +127,7 @@ nav a:focus{
 }
 
 .search-box button:hover {
-  background-color: #15108A;
+  background-color: #1E2AFA;
 }
 
 
@@ -152,12 +152,18 @@ nav a:focus{
 
 .car-card {
     background-color: #1D18B1;
-    padding: 70px 0;
-    text-align: center;
     width: 180px;
-    border-radius: 8px;
+    height: 180px;        
+    border-radius: 10px;  
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     transition: 0.3s;
+    overflow: hidden;     
 }
+
 
 .car-card a{
     color: white;
@@ -169,6 +175,12 @@ nav a:focus{
 .car-card:hover {
     transform: scale(1.05);
     cursor: pointer;
+}
+
+.car-card img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
 }
 
 
