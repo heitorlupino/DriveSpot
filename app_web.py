@@ -281,6 +281,30 @@ def relatorio():
 
     return render_template("relatorio.html", dados=dados, marcas=marcas)
 
+@app.route('/carros/<marca>', methods=['GET'])
+def carros_por_marca(marca):
+
+    try:
+        conexao = obter_conexao()
+        cursor = conexao.cursor(dictionary=True)
+        
+
+        cursor.execute("SELECT * FROM veiculos WHERE id_marca = (SELECT id_marca FROM marcas WHERE nome = %s)", (marca,))
+        carros = cursor.fetchall()
+        
+        if not carros:
+            flash(f"Nenhum carro encontrado para a marca {marca}.", "info")
+
+        return render_template("carros_por_marca.html", marca=marca, carros=carros)
+
+    except Exception as e:
+        flash(f"Erro ao buscar carros: {e}")
+        return redirect(url_for("tela_inicial"))
+    
+    finally:
+        cursor.close()
+        conexao.close()
+
 
 @app.before_request
 def limpar_sessao_ao_iniciar():
