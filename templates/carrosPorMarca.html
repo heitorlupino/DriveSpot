@@ -4,23 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Carros - {{ marca }}</title>
-    <link rel="stylesheet" href="../static/css/styletelainicial.css">
-    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styletelainicial.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/Logo-DriveSpot.ico') }}" type="image/x-icon">
 </head>
 <body>
     <!-- Navbar -->
     <nav class="navbar">
         <div class="logo">
             <a href="/telaInicial">
-                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+                <img src="{{ url_for('static', filename='img/Logo_branco - DriveSpot.png') }}" alt="Logo - DriveSpot">
             </a>
         </div>
+
         <ul class="nav-links">
             <a href="/adicionar">Adicionar</a>
             <a href="/editar">Editar</a>
             <a href="/remover">Remover</a>
             <a href="/relatorio">Relatório</a>
         </ul>
+
         <div class="perfil">
             {% if session.usuario %}
                 <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
@@ -31,18 +34,40 @@
         </div>
     </nav>
 
-    <!-- Título da página -->
-    <section class="banner">
-        <h1>Carros da Marca: {{ marca }}</h1>
+    <!-- Área da marca e busca -->
+    <section class="marca-area">
+        <div class="marca-info">
+            <span class="marca-nome">{{ marca }}</span>
+
+            <img src="{{ url_for('static', filename='img/logo_carros/' + marca|lower + '_logo.png') }}"
+                 class="marca-logo"
+                 alt="Logo {{ marca }}">
+        </div>
+
+        <form method="POST" action="/carros/{{ marca }}" class="search-form">
+            <div class="search-box">
+                <input type="text" name="pesquisa" placeholder="Buscar por nome">
+                <button type="submit">🔍</button>
+            </div>
+        </form>
     </section>
+
+    <!-- Fundo com logo gigante -->
+    <img src="{{ url_for('static', filename='img/logo_carros/' + marca|lower + '_logo.png') }}"
+         class="marca-fundo"
+         alt="Logo Fundo">
 
     <!-- Exibição dos carros -->
     <section class="car-section">
         {% if carros %}
             <div class="car-grid">
                 {% for carro in carros %}
-                    <div class="car-card">
-                        <img src="{{ carro['imagem_url'] or '/static/img/car_placeholder.png' }}" alt="{{ carro['modelo'] }}">
+                    <div class="vehicle-card">
+
+                        <img src="{{ url_for('static', filename=carro['imagem_url']) 
+                                    if carro['imagem_url'] 
+                                    else url_for('static', filename='img/car_placeholder.png') }}">
+
                         <h3>{{ carro['modelo'] }}</h3>
                         <p>Ano: {{ carro['ano'] }}</p>
                         <p>Preço: R${{ carro['preco'] }}</p>
