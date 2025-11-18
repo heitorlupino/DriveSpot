@@ -43,7 +43,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form action="/adicionar" method="post">
+            <form action="/adicionar" method="post" enctype="multipart/form-data">
                 <label>Modelo</label>
                 <input type="text" name="modelo" placeholder="Ex: Corolla" required>
 
@@ -61,6 +61,9 @@
 
                 <label>Preço</label>
                 <input type="number" name="preco" placeholder="Ex: 120000" required>
+
+                <label for="imagem">Imagem do veículo (opcional)</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*">
 
                 <button type="submit" class="btn-salvar">Salvar</button>
 

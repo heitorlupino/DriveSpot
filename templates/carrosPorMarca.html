@@ -42,7 +42,7 @@
             <div class="car-grid">
                 {% for carro in carros %}
                     <div class="car-card">
-                        <img src="{{ carro['imagem_url'] }}" alt="{{ carro['modelo'] }}">
+                        <img src="{{ carro['imagem_url'] or '/static/img/car_placeholder.png' }}" alt="{{ carro['modelo'] }}">
                         <h3>{{ carro['modelo'] }}</h3>
                         <p>Ano: {{ carro['ano'] }}</p>
                         <p>Preço: R${{ carro['preco'] }}</p>

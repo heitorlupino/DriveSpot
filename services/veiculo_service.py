@@ -31,7 +31,7 @@ def cadastrar_usuario(nome, email, senha):
         cursor.close()
         conexao.close()
 
-def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco):
+def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url=None):
     conn = conectar()
     if conn is None:
         return False
@@ -44,9 +44,9 @@ def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco):
 
         # Inserir veículo
         cursor.execute("""
-            INSERT INTO Veiculos (id_usuario, id_marca, ano, modelo, preco)
-            VALUES (%s, %s, %s, %s, %s)
-        """, (id_usuario, id_marca, ano, modelo, preco))
+            INSERT INTO Veiculos (id_usuario, id_marca, ano, modelo, preco, imagem_url)
+            VALUES (%s, %s, %s, %s, %s, %s)
+        """, (id_usuario, id_marca, ano, modelo, preco, imagem_url))
 
         # aqui você poderia adicionar lógica adicional
         # ex: inserir categoria na tabela intermediária
@@ -85,13 +85,31 @@ def buscar_veiculos_por_texto(texto):
 
 def remover_veiculo(id_veiculo):
     conexao = conectar()
-    cursor = conexao.cursor()
+    cursor = conexao.cursor(dictionary=True)
 
-    cursor.execute("DELETE FROM veiculos WHERE id_veiculo = %s", (id_veiculo,))
-    conexao.commit()
+    try:
+        # Buscar a imagem associada ao veículo
+        cursor.execute("SELECT imagem_url FROM Veiculos WHERE id_veiculo = %s", (id_veiculo,))
+        row = cursor.fetchone()
 
-    cursor.close()
-    conexao.close()
+        # Deletar imagem antiga, se existir
+        if row and row.get("imagem_url"):
+            caminho_relativo = row["imagem_url"].lstrip("/")  # remove a barra inicial
+            caminho_absoluto = os.path.join(app.root_path, caminho_relativo)
+
+            if os.path.exists(caminho_absoluto):
+                try:
+                    os.remove(caminho_absoluto)
+                except Exception:
+                    pass  # evita quebrar o fluxo caso dê erro
+
+        # Remover o veículo do banco de dados
+        cursor.execute("DELETE FROM Veiculos WHERE id_veiculo = %s", (id_veiculo,))
+        conexao.commit()
+
+    finally:
+        cursor.close()
+        conexao.close()
 
 
 def buscar_por_id(id_veiculo):
@@ -135,7 +153,7 @@ def buscar_veiculo_exato(nome):
         cursor.close()
         conexao.close()
 
-def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco):
+def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco, imagem_url):
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -151,10 +169,10 @@ def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco):
     # Atualizar o veículo com o id_marca correto
     query = """
         UPDATE veiculos
-        SET modelo = %s, id_marca = %s, ano = %s, preco = %s
+        SET modelo = %s, id_marca = %s, ano = %s, preco = %s, imagem_url = %s
         WHERE id_veiculo = %s
     """
-    cursor.execute(query, (modelo, id_marca, ano, preco, id_veiculo))
+    cursor.execute(query, (modelo, id_marca, ano, preco, id_veiculo, imagem_url))
     conexao.commit()
 
     cursor.close()

@@ -1,10 +1,25 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, get_flashed_messages
 from db.conexao import conectar as obter_conexao
 from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
 from functools import wraps
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"
+
+UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'img', 'carros')
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 MB limite opcional
+
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
+
+# cria a pasta se não existir
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def login_obrigatorio(f):
     @wraps(f)
@@ -135,12 +150,28 @@ def adicionar_veiculo():
         ano = int(request.form['ano'])
         preco = float(request.form['preco'])
 
+        imagem = request.files.get('imagem')  # FileStorage ou None
+        imagem_url = None
+
+        if imagem and imagem.filename != '':
+            if allowed_file(imagem.filename):
+                # cria nome único (timestamp + nome seguro)
+                filename = secure_filename(imagem.filename)
+                timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
+                filename = f"{timestamp}_{filename}"
+                caminho_abs = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                imagem.save(caminho_abs)
+                # caminho relativo usado no HTML (começando por /static/...)
+                imagem_url = f"/static/img/carros/{filename}"
+            else:
+                flash("Formato de imagem não permitido. Use png/jpg/jpeg/webp/gif.")
+                return redirect(url_for('adicionar_veiculo'))
         
         id_usuario = session["usuario"]["id"] 
         id_marca = buscar_id_marca(marca)  
 
         try:
-            cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco)
+            cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url)
             flash("Veículo cadastrado com sucesso!", "adicionar")
         except Exception as e:
             flash(f"Erro ao cadastrar veículo: {e}")
@@ -236,13 +267,42 @@ def editar():
             ano = request.form.get("ano")
             preco = request.form.get("preco")
 
-            atualizar_veiculo(id_veiculo, modelo, marca, ano, preco)
+            # busca o carro atual para poder remover a imagem antiga
+            veiculo = buscar_por_id(id_veiculo)
+
+            # --- TRATAR IMAGEM ---
+            nova_imagem = request.files.get("imagem")
+
+            imagem_url = veiculo["imagem_url"]  # mantém a antiga por padrão
+
+            if nova_imagem and nova_imagem.filename != "":
+                if allowed_file(nova_imagem.filename):
+
+                    # APAGAR IMAGEM ANTIGA (se existir)
+                    if veiculo["imagem_url"]:
+                        try:
+                            caminho_antigo = veiculo["imagem_url"].lstrip("/")
+                            os.remove(os.path.join(app.root_path, caminho_antigo))
+                        except:
+                            pass
+
+                    # SALVAR NOVA IMAGEM
+                    nome_arquivo = secure_filename(nova_imagem.filename)
+                    caminho = os.path.join("static/img/carros", nome_arquivo)
+                    nova_imagem.save(os.path.join(app.root_path, caminho))
+
+                    imagem_url = "/" + caminho  # nova URL para o banco
+
+            # Atualizar no BD
+            atualizar_veiculo(id_veiculo, modelo, marca, ano, preco, imagem_url)
+
             mensagem = "Veículo atualizado com sucesso!"
 
-            # Recarrega os dados atualizados
+            # recarregar os dados salvos
             veiculo = buscar_por_id(id_veiculo)
 
     return render_template("editar.html", veiculo=veiculo, mensagem=mensagem)
+
 
 @app.route('/relatorio', methods=['GET', 'POST'])
 @login_obrigatorio
@@ -282,6 +342,7 @@ def relatorio():
     return render_template("relatorio.html", dados=dados, marcas=marcas)
 
 @app.route('/carros/<marca>', methods=['GET'])
+@login_obrigatorio
 def carros_por_marca(marca):
 
     try:
@@ -289,13 +350,20 @@ def carros_por_marca(marca):
         cursor = conexao.cursor(dictionary=True)
         
 
-        cursor.execute("SELECT * FROM veiculos WHERE id_marca = (SELECT id_marca FROM marcas WHERE nome = %s)", (marca,))
+        cursor.execute("""
+            SELECT * FROM veiculos 
+            WHERE id_marca = (
+                SELECT id_marca FROM marcas 
+                WHERE LOWER(nome) = LOWER(%s)
+            )
+    """, (marca,))
+
         carros = cursor.fetchall()
         
         if not carros:
             flash(f"Nenhum carro encontrado para a marca {marca}.", "info")
 
-        return render_template("carros_por_marca.html", marca=marca, carros=carros)
+        return render_template("carrosPorMarca.html", marca=marca, carros=carros)
 
     except Exception as e:
         flash(f"Erro ao buscar carros: {e}")
@@ -307,10 +375,14 @@ def carros_por_marca(marca):
 
 
 @app.before_request
-def limpar_sessao_ao_iniciar():
-    if app.debug and "sessao_limpa" not in session:
+def limpar_sessao_em_rotas_especificas():
+    rotas_limpar = ["/adicionar", "/editar", "/remover", "/relatorio"]
+
+    # só limpa se for uma dessas rotas
+    if request.path in rotas_limpar and "sessao_limpa" not in session:
         session.clear()
         session["sessao_limpa"] = True
+
 
 if __name__ == "__main__":
     app.run(debug=True)
