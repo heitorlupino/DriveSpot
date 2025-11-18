@@ -4,6 +4,7 @@ from db.conexao import conectar as obter_conexao
 from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
 from functools import wraps
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = "algumasecretkey"

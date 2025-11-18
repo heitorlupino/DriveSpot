@@ -64,9 +64,7 @@
                 {% for carro in carros %}
                     <div class="vehicle-card">
 
-                        <img src="{{ url_for('static', filename=carro['imagem_url']) 
-                                    if carro['imagem_url'] 
-                                    else url_for('static', filename='img/car_placeholder.png') }}">
+                        <img src="{{ carro['imagem_url'] or url_for('static', filename='img/car_placeholder.png') }}">
 
                         <h3>{{ carro['modelo'] }}</h3>
                         <p>Ano: {{ carro['ano'] }}</p>

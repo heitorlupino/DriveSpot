@@ -257,8 +257,8 @@ nav a:focus{
 }
 
 .vehicle-card {
-    width: 230px;
-    height: 230px;
+    width: 280px;
+    height: 280px;
     background-color: #1D18B1;
     border-radius: 8px;
     margin: 15px;
@@ -279,7 +279,7 @@ nav a:focus{
 
 .vehicle-card img {
     width: 100%;
-    height: 120px;
+    height: 160px;
     object-fit: contain;
     margin-bottom: 8px;
 }
