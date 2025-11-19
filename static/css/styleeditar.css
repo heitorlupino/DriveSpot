@@ -191,11 +191,3 @@ input[type="number"] {
   color: #155724;
   font-weight: bold;
 }
-
-html, body {
-    height: 100%;
-    overflow: hidden;
-}
-
-
-

@@ -109,8 +109,3 @@ form input {
 .salvar:hover {
     background-color: #ddd;
 }
-
-html, body {
-    height: 100%;
-    overflow: hidden;
-}
