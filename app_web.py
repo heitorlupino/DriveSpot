@@ -234,7 +234,7 @@ def confirmar_remocao(id_veiculo):
     if not veiculo:
         flash("Veículo não encontrado.")
         return redirect(url_for("remover"))
-    return render_template("confirmar_remocao.html", veiculo=veiculo)
+    return render_template("confirmar_remocao.html", carro=veiculo)
 
 
 @app.route('/remover/<int:id_veiculo>', methods=['POST'])

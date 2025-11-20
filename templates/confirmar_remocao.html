@@ -3,20 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <title>Confirmar Remoção</title>
-  <link rel="stylesheet" href="../static/css/styleremover.css">
+  <link rel="stylesheet" href="../static/css/styleConficarRemocao.css">
 </head>
 
 <body>
+
+  <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
   <main class="container">
     <div class="card">
       <h1>Confirmar Remoção</h1>
 
-      <p><strong>Marca:</strong> {{ veiculo.marca }}</p>
-      <p><strong>Modelo:</strong> {{ veiculo.modelo }}</p>
-      <p><strong>Ano:</strong> {{ veiculo.ano }}</p>
-      <p><strong>Preço:</strong> R$ {{ veiculo.preco }}</p>
+      <img src="{{ carro['imagem_url'] or url_for('static', filename='img/car_placeholder.png') }}">
 
-      <form action="/remover/{{ veiculo.id_veiculo }}" method="POST">
+      <p><strong>Marca:</strong> {{ carro.marca }}</p>
+      <p><strong>Modelo:</strong> {{ carro.modelo }}</p>
+      <p><strong>Ano:</strong> {{ carro.ano }}</p>
+      <p><strong>Preço:</strong> R$ {{ carro.preco }}</p>
+
+      <form action="/remover/{{ carro.id_veiculo }}" method="POST">
         <button class="btn remove" type="submit">Remover</button>
         <a href="/remover" class="btn cancel">Cancelar</a>
       </form>

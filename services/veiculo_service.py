@@ -117,7 +117,7 @@ def buscar_por_id(id_veiculo):
     cursor = conexao.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT v.id_veiculo, v.modelo, v.ano, v.preco, m.nome AS marca
+        SELECT v.id_veiculo, v.modelo, v.ano, v.preco, v.imagem_url, m.nome AS marca
         FROM veiculos v
         JOIN marcas m ON v.id_marca = m.id_marca
         WHERE id_veiculo = %s

@@ -59,13 +59,15 @@
       <div style="margin-top: 20px;">
         <p><strong>Veículos encontrados: {{ resultados|length }}</strong></p>
 
-        {% for v in resultados %}
-        <form action="/confirmar-remocao/{{ v.id_veiculo }}" method="GET">
-          <button type="submit" class="btn resultado-btn">
-            {{ v.marca }} • {{ v.modelo }} • {{ v.ano }}
-          </button>
-        </form>
-        {% endfor %}
+        <div class="resultado-grid">
+          {% for v in resultados %}
+          <form action="/confirmar-remocao/{{ v.id_veiculo }}" method="GET">
+            <button type="submit" class="btn resultado-btn">
+              {{ v.marca }} • {{ v.modelo }} • {{ v.ano }}
+            </button>
+          </form>
+          {% endfor %}
+        </div>
       </div>
       {% endif %}
 
@@ -74,8 +76,9 @@
       {% endif %}
 
       <div class="buttons">
-        <button class="btn cancel">Cancelar</button>
-        <button class="btn remove">Remover</button>
+        <button class="btn cancelAction">
+          <a href="/telaInicial">Cancelar</a>
+        </button>
       </div>
     </div>
   </main>

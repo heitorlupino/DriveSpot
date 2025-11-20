@@ -1,0 +1,158 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar{
+    background-color: #1D18B1;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-icon {
+  width: 28px;
+  height: 28px;
+}
+
+.logo-text {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.logo img{
+    width: 150px;
+    height: auto;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 4px;
+}
+
+nav a{
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 40px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    transition: 0.3s;
+}
+
+
+
+nav a:hover,
+nav a:focus{
+    background-color: #15158C;
+    text-decoration: 2px underline;
+}
+
+.perfil a{
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 40px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.perfil a:hover{
+    background-color: #15158C;
+    text-decoration: 2px underline;
+}
+
+body {
+    background-color: #d9d9d9;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.card {
+    background: white;
+    padding: 25px 30px;
+    max-width: 700px;
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.card h1 {
+    color: #1D18B1;
+    margin-bottom: 20px;
+}
+
+.card img {
+    width: 100%;
+    max-height: 350px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.card p {
+    text-align: left;
+    font-size: 18px;
+    margin: 6px 0;
+}
+
+form {
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 12px 20px;
+    font-size: 18px;
+    width: 180px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    font-weight: 600;
+    font-size: 20px;
+    margin: 10px;
+}
+
+.remove {
+    background-color: #1D18B1;
+    color: white;
+}
+
+.remove:hover {
+    background-color: #15158C;
+}
+
+.cancel {
+    background-color: white;
+    color: #1D18B1;
+    border: #1D18B1 2px solid;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 6px;
+    width: 180px;
+}
+
+.cancel:hover {
+    background-color: #d9d9d9;
+}
