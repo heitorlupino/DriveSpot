@@ -216,10 +216,12 @@ nav a:focus{
 
 .car-grid {
     display: flex;
-    margin: 40px 0;
-    gap: 30px;
+    margin: 40px auto;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 20px;
     flex-wrap: wrap;
     justify-content: center;
+    max-width: 1300px;
 }
 
 .car-card {
@@ -299,4 +301,17 @@ nav a:focus{
 html, body {
     height: 100%;
 }
+
+@media (max-width: 900px) {
+    .car-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 500px) {
+    .car-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
 

@@ -1,6 +1,8 @@
+import os
 from db.conexao import conectar
 from werkzeug.security import generate_password_hash
 from collections import Counter
+from flask import current_app
 
 def cadastrar_usuario(nome, email, senha):
     conexao = conectar()
@@ -95,7 +97,7 @@ def remover_veiculo(id_veiculo):
         # Deletar imagem antiga, se existir
         if row and row.get("imagem_url"):
             caminho_relativo = row["imagem_url"].lstrip("/")  # remove a barra inicial
-            caminho_absoluto = os.path.join(app.root_path, caminho_relativo)
+            caminho_absoluto = os.path.join(current_app.root_path, caminho_relativo)
 
             if os.path.exists(caminho_absoluto):
                 try:
