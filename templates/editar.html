@@ -71,6 +71,17 @@
         <label for="preco">Preço</label>
         <input type="text" id="preco" name="preco" value="{{ veiculo.preco }}" placeholder="Ex: 120000">
 
+        <label for="categoria">Categoria:</label>
+        <select id="categoria" name="categoria" class="form-control" required>
+          {% for cat in categorias %}
+            <option value="{{ cat.id_categoria }}"
+              {% if veiculo and veiculo.id_categoria == cat.id_categoria %}selected{% endif %}>
+              {{ cat.nome }}
+            </option>
+          {% endfor %}
+        </select>
+
+
         <div class="buttons">
           <button type="submit" name="salvar" class="btn">Salvar</button>
           <button type="button" class="btn cancel" onclick="window.location.href='/'">Cancelar</button>

@@ -61,6 +61,17 @@
 
                 <label>Preço</label>
                 <input type="number" name="preco" placeholder="Ex: 120000" required>
+                
+                <label>Categorias</label>
+                <div class="categorias-box">
+                    {% for cat in categorias %}
+                        <label class="cat-item">
+                            <input type="checkbox" name="categorias" value="{{ cat.id_categoria }}">
+                            {{ cat.nome }}
+                        </label>
+                    {% endfor %}
+                </div>
+
 
                 <label for="imagem">Imagem do veículo (opcional)</label>
                 <input type="file" id="imagem" name="imagem" accept="image/*">

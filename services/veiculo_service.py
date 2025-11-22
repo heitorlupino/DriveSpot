@@ -33,7 +33,16 @@ def cadastrar_usuario(nome, email, senha):
         cursor.close()
         conexao.close()
 
-def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url=None):
+def buscar_categorias():
+    conn = conectar()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT id_categoria, nome FROM Categorias ORDER BY nome")
+    categorias = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return categorias
+
+def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url=None, id_categoria=None):
     conn = conectar()
     if conn is None:
         return False
@@ -46,12 +55,9 @@ def cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url=None)
 
         # Inserir veículo
         cursor.execute("""
-            INSERT INTO Veiculos (id_usuario, id_marca, ano, modelo, preco, imagem_url)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (id_usuario, id_marca, ano, modelo, preco, imagem_url))
-
-        # aqui você poderia adicionar lógica adicional
-        # ex: inserir categoria na tabela intermediária
+            INSERT INTO Veiculos (id_usuario, id_marca, ano, modelo, preco, imagem_url, id_categoria)
+            VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """, (id_usuario, id_marca, ano, modelo, preco, imagem_url, id_categoria))
 
         conn.commit()
         print("Veículo cadastrado com sucesso!")
@@ -119,9 +125,10 @@ def buscar_por_id(id_veiculo):
     cursor = conexao.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT v.id_veiculo, v.modelo, v.ano, v.preco, v.imagem_url, m.nome AS marca
+        SELECT v.id_veiculo, v.modelo, v.ano, v.preco, v.imagem_url, m.nome AS marca, c.nome AS categoria
         FROM veiculos v
         JOIN marcas m ON v.id_marca = m.id_marca
+        LEFT JOIN categorias c ON v.id_categoria = c.id_categoria
         WHERE id_veiculo = %s
     """, (id_veiculo,))
 
@@ -139,9 +146,10 @@ def buscar_veiculo_exato(nome):
         partes = nome.split()
 
         sql = """
-            SELECT v.id_veiculo, v.modelo, m.nome AS marca, v.ano, v.preco
+            SELECT v.id_veiculo, v.modelo, m.nome AS marca, v.ano, v.preco, c.nome AS categoria
             FROM veiculos v
             INNER JOIN marcas m ON v.id_marca = m.id_marca
+            LEFT JOIN categorias c ON v.id_categoria = c.id_categoria
             WHERE CONCAT(m.nome, ' ', v.modelo, ' ', v.ano) LIKE %s
         """
 
@@ -155,7 +163,7 @@ def buscar_veiculo_exato(nome):
         cursor.close()
         conexao.close()
 
-def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco, imagem_url):
+def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco, imagem_url, id_categoria):
     conexao = conectar()
     cursor = conexao.cursor()
 
@@ -171,10 +179,10 @@ def atualizar_veiculo(id_veiculo, modelo, nome_marca, ano, preco, imagem_url):
     # Atualizar o veículo com o id_marca correto
     query = """
         UPDATE veiculos
-        SET modelo = %s, id_marca = %s, ano = %s, preco = %s, imagem_url = %s
+        SET modelo = %s, id_marca = %s, ano = %s, preco = %s, imagem_url = %s, id_categoria = %s
         WHERE id_veiculo = %s
     """
-    cursor.execute(query, (modelo, id_marca, ano, preco, id_veiculo, imagem_url))
+    cursor.execute(query, (modelo, id_marca, ano, preco, imagem_url, id_categoria, id_veiculo)) 
     conexao.commit()
 
     cursor.close()
@@ -185,9 +193,10 @@ def gerar_relatorio(filtros):
     cursor = conexao.cursor(dictionary=True)
 
     query = """
-        SELECT v.modelo, m.nome AS marca, v.ano, v.preco
+        SELECT v.modelo, m.nome AS marca, v.ano, v.preco, c.nome AS categoria
         FROM Veiculos v
         INNER JOIN Marcas m ON v.id_marca = m.id_marca
+        LEFT JOIN Categorias c ON v.id_categoria = c.id_categoria
         WHERE 1=1
     """
     valores = []
@@ -230,4 +239,32 @@ def gerar_relatorio(filtros):
         "ano_frequente": ano_frequente,
         "veiculos": veiculos
     }
+
+def deletar_categorias():
+    conn = conectar()
+    if conn is None:
+        return False
+
+    try:
+        cursor = conn.cursor()
+
+        # Primeiro, remover vínculo dos veículos
+        cursor.execute("UPDATE Veiculos SET id_categoria = NULL")
+
+        # Agora apagar categorias
+        cursor.execute("DELETE FROM Categorias")
+
+        conn.commit()
+        print("Categorias apagadas com sucesso!")
+        return True
+
+    except Exception as e:
+        print(f"Erro ao deletar categorias: {e}")
+        conn.rollback()
+        return False
+
+    finally:
+        cursor.close()
+        conn.close()
+
 

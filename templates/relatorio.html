@@ -77,6 +77,7 @@
                         <th>Marca</th>
                         <th>Ano</th>
                         <th>Preço</th>
+                        <th>Categoria</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -86,6 +87,7 @@
                         <td>{{ v.marca }}</td>
                         <td>{{ v.ano }}</td>
                         <td>R$ {{ v.preco }}</td>
+                        <td>{{ v.categoria or "Sem categoria" }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

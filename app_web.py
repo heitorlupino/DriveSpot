@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, session, get_flashed_messages
 from db.conexao import conectar as obter_conexao
-from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, cadastrar_usuario, gerar_relatorio
+from services.veiculo_service import cadastrar_veiculo, buscar_veiculos_por_texto, remover_veiculo, buscar_por_id, buscar_veiculo_exato, atualizar_veiculo, gerar_relatorio, buscar_categorias
 from functools import wraps
 from werkzeug.utils import secure_filename
 from datetime import datetime
@@ -137,8 +137,6 @@ def tela_inicial():
 
     return render_template("telaInicial.html", nome_usuario=nome_usuario, resultados=resultados)
 
-
-
 @app.route('/adicionar', methods=['GET', 'POST'])
 @login_obrigatorio
 def adicionar_veiculo():
@@ -151,42 +149,55 @@ def adicionar_veiculo():
         ano = int(request.form['ano'])
         preco = float(request.form['preco'])
 
-        imagem = request.files.get('imagem')  # FileStorage ou None
+        categoria_id = request.form.get('categoria')  
+
+        if not categoria_id:
+            categorias_selecionadas = request.form.getlist('categorias')
+            if categorias_selecionadas:
+                categoria_id = categorias_selecionadas[0]
+
+
+        if not categoria_id or categoria_id == "":
+            categoria_id = None
+        else:
+            categoria_id = int(categoria_id)
+
+        imagem = request.files.get('imagem')
         imagem_url = None
 
         if imagem and imagem.filename != '':
             if allowed_file(imagem.filename):
-                # cria nome único (timestamp + nome seguro)
                 filename = secure_filename(imagem.filename)
                 timestamp = datetime.utcnow().strftime('%Y%m%d%H%M%S%f')
                 filename = f"{timestamp}_{filename}"
                 caminho_abs = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 imagem.save(caminho_abs)
-                # caminho relativo usado no HTML (começando por /static/...)
                 imagem_url = f"/static/img/carros/{filename}"
             else:
-                flash("Formato de imagem não permitido. Use png/jpg/jpeg/webp/gif.")
+                flash("Formato de imagem não permitido.")
                 return redirect(url_for('adicionar_veiculo'))
         
-        id_usuario = session["usuario"]["id"] 
-        id_marca = buscar_id_marca(marca)  
+        id_usuario = session["usuario"]["id"]
+        id_marca = buscar_id_marca(marca)
 
         try:
-            cadastrar_veiculo(id_usuario, id_marca, ano, modelo, preco, imagem_url)
+            cadastrar_veiculo(
+                id_usuario, id_marca, ano, modelo, preco,
+                imagem_url, categoria_id
+            )
             flash("Veículo cadastrado com sucesso!", "adicionar")
         except Exception as e:
             flash(f"Erro ao cadastrar veículo: {e}")
             
         return redirect(url_for('adicionar_veiculo'))
     
-    return render_template('adicionar.html')
-
+    categorias = buscar_categorias()
+    return render_template('adicionar.html', categorias=categorias)
 
 def buscar_id_marca(nome_marca):
-    import mysql.connector
 
     conexao = obter_conexao()
-    cursor = conexao.cursor(buffered=True)  # <-- evita o erro de unread result
+    cursor = conexao.cursor(buffered=True)
 
     try:
         # Verifica se a marca já existe
@@ -267,19 +278,19 @@ def editar():
             marca = request.form.get("marca")
             ano = request.form.get("ano")
             preco = request.form.get("preco")
+            categoria_id = request.form.get("categoria")
 
-            # busca o carro atual para poder remover a imagem antiga
+            # busca o carro atual para remover imagem antiga
             veiculo = buscar_por_id(id_veiculo)
 
-            # --- TRATAR IMAGEM ---
             nova_imagem = request.files.get("imagem")
+            imagem_url = veiculo["imagem_url"]
 
-            imagem_url = veiculo["imagem_url"]  # mantém a antiga por padrão
-
+            # --- TRATAR IMAGEM ---
             if nova_imagem and nova_imagem.filename != "":
                 if allowed_file(nova_imagem.filename):
 
-                    # APAGAR IMAGEM ANTIGA (se existir)
+                    # APAGAR IMAGEM ANTIGA
                     if veiculo["imagem_url"]:
                         try:
                             caminho_antigo = veiculo["imagem_url"].lstrip("/")
@@ -287,22 +298,31 @@ def editar():
                         except:
                             pass
 
-                    # SALVAR NOVA IMAGEM
+                    # SALVAR NOVA
                     nome_arquivo = secure_filename(nova_imagem.filename)
                     caminho = os.path.join("static/img/carros", nome_arquivo)
                     nova_imagem.save(os.path.join(app.root_path, caminho))
 
-                    imagem_url = "/" + caminho  # nova URL para o banco
+                    imagem_url = "/" + caminho
 
-            # Atualizar no BD
-            atualizar_veiculo(id_veiculo, modelo, marca, ano, preco, imagem_url)
+            # Atualizar no BD (novo parâmetro categoria)
+            atualizar_veiculo(
+                id_veiculo, modelo, marca, ano, preco, imagem_url, categoria_id
+            )
 
             mensagem = "Veículo atualizado com sucesso!"
 
-            # recarregar os dados salvos
             veiculo = buscar_por_id(id_veiculo)
 
-    return render_template("editar.html", veiculo=veiculo, mensagem=mensagem)
+    # Sempre buscar categorias para o SELECT no HTML
+    categorias = buscar_categorias()
+
+    return render_template(
+        "editar.html",
+        veiculo=veiculo,
+        mensagem=mensagem,
+        categorias=categorias
+    )
 
 
 @app.route('/relatorio', methods=['GET', 'POST'])
@@ -349,18 +369,18 @@ def carros_por_marca(marca):
     try:
         conexao = obter_conexao()
         cursor = conexao.cursor(dictionary=True)
-        
 
         cursor.execute("""
-            SELECT * FROM veiculos 
-            WHERE id_marca = (
-                SELECT id_marca FROM marcas 
-                WHERE LOWER(nome) = LOWER(%s)
-            )
-    """, (marca,))
+            SELECT v.*, 
+                   c.nome AS categoria
+            FROM veiculos v
+            JOIN marcas m ON v.id_marca = m.id_marca
+            LEFT JOIN categorias c ON v.id_categoria = c.id_categoria
+            WHERE LOWER(m.nome) = LOWER(%s)
+        """, (marca,))
 
         carros = cursor.fetchall()
-        
+
         if not carros:
             flash(f"Nenhum carro encontrado para a marca {marca}.", "info")
 
@@ -369,7 +389,7 @@ def carros_por_marca(marca):
     except Exception as e:
         flash(f"Erro ao buscar carros: {e}")
         return redirect(url_for("tela_inicial"))
-    
+
     finally:
         cursor.close()
         conexao.close()

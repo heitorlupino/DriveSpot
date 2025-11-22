@@ -40,6 +40,7 @@
       <p><strong>Modelo:</strong> {{ carro.modelo }}</p>
       <p><strong>Ano:</strong> {{ carro.ano }}</p>
       <p><strong>Preço:</strong> R$ {{ carro.preco }}</p>
+      <p><strong>Categoria:</strong>{{ carro.categoria or "Sem categoria"}}</p>
 
       <form action="/remover/{{ carro.id_veiculo }}" method="POST">
         <button class="btn remove" type="submit">Remover</button>
