@@ -44,12 +44,13 @@
                  alt="Logo {{ marca }}">
         </div>
 
-        <form method="POST" action="/carros/{{ marca }}" class="search-form">
+        <form method="GET" action="{{ url_for('carros_por_marca', marca=marca) }}" class="search-form">
             <div class="search-box">
-                <input type="text" name="pesquisa" placeholder="Buscar por nome">
+                <input type="text" name="modelo" placeholder="Buscar por modelo" value="{{ modelo or '' }}">
                 <button type="submit">🔍</button>
             </div>
         </form>
+
     </section>
 
     <!-- Fundo com logo gigante -->

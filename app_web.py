@@ -125,17 +125,38 @@ def logout():
 @app.route("/telaInicial", methods=["GET", "POST"])
 def tela_inicial():
     nome_usuario = session["usuario"]["nome"] if "usuario" in session else None
-    resultados = []
 
     if request.method == "POST":
         termo_pesquisa = request.form.get("pesquisa", "").strip()
+
         if termo_pesquisa:
             try:
-                resultados = buscar_veiculos_por_texto(termo_pesquisa)
-            except Exception as e:
-                flash(f"Erro ao buscar veículos: {e}")
+                conexao = obter_conexao()
+                cursor = conexao.cursor(dictionary=True)
 
-    return render_template("telaInicial.html", nome_usuario=nome_usuario, resultados=resultados)
+                cursor.execute("""
+                    SELECT v.*, m.nome AS marca
+                    FROM veiculos v
+                    JOIN marcas m ON v.id_marca = m.id_marca
+                    WHERE LOWER(v.modelo) LIKE LOWER(%s)
+                """, (f"%{termo_pesquisa}%",))
+
+                resultado = cursor.fetchone()
+
+                # Se encontrou um carro → redireciona para a tela por marca
+                if resultado:
+                    marca = resultado["marca"]
+                    modelo = resultado["modelo"]
+                    return redirect(url_for("carros_por_marca", marca=marca, modelo=modelo))
+
+                else:
+                    flash("Nenhum carro encontrado com esse nome.")
+
+            except Exception as e:
+                flash(f"Erro ao pesquisar: {e}")
+
+    return render_template("telaInicial.html", nome_usuario=nome_usuario)
+
 
 @app.route('/adicionar', methods=['GET', 'POST'])
 @login_obrigatorio
@@ -366,25 +387,33 @@ def relatorio():
 @login_obrigatorio
 def carros_por_marca(marca):
 
+    modelo_filtro = request.args.get("modelo")  # ← Filtro opcional
+
     try:
         conexao = obter_conexao()
         cursor = conexao.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT v.*, 
-                   c.nome AS categoria
+        sql = """
+            SELECT v.*, c.nome AS categoria
             FROM veiculos v
             JOIN marcas m ON v.id_marca = m.id_marca
             LEFT JOIN categorias c ON v.id_categoria = c.id_categoria
             WHERE LOWER(m.nome) = LOWER(%s)
-        """, (marca,))
+        """
 
+        params = [marca]
+
+        if modelo_filtro:
+            sql += " AND LOWER(v.modelo) LIKE LOWER(%s)"
+            params.append(f"%{modelo_filtro}%")
+
+        cursor.execute(sql, params)
         carros = cursor.fetchall()
 
         if not carros:
-            flash(f"Nenhum carro encontrado para a marca {marca}.", "info")
+            flash("Nenhum carro encontrado com esse modelo para essa marca.")
 
-        return render_template("carrosPorMarca.html", marca=marca, carros=carros)
+        return render_template("carrosPorMarca.html", marca=marca, carros=carros, modelo=modelo_filtro)
 
     except Exception as e:
         flash(f"Erro ao buscar carros: {e}")
@@ -393,7 +422,6 @@ def carros_por_marca(marca):
     finally:
         cursor.close()
         conexao.close()
-
 
 @app.before_request
 def limpar_sessao_em_rotas_especificas():
