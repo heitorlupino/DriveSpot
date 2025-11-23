@@ -11,7 +11,7 @@ app.secret_key = "algumasecretkey"
 
 UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'img', 'carros')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
-MAX_CONTENT_LENGTH = 4 * 1024 * 1024  # 4 MB limite opcional
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024 # 16 MB limite opcional
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = MAX_CONTENT_LENGTH
