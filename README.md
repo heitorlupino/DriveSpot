@@ -63,6 +63,3 @@ O DriveSpot permite que os usuários cadastrem, consultem, atualizem e removam i
 
 Desenvolvido por **Gabriel Quirino Bressanin, Guilherme Barros Oliveira, Heitor Lupino, João Pedro Ferreira, Matheus Risso**  
 Estudante de Ciência da Computação na [UNISAGRADO](https://unisagrado.edu.br)
-
-🔗 [LinkedIn - Heitor Lupino](https://www.linkedin.com/in/heitor-lupino-b580562b5)  
-📧 heitorlupino@gmail.com
