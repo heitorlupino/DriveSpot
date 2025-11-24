@@ -71,15 +71,21 @@
         <label for="preco">Preço</label>
         <input type="text" id="preco" name="preco" value="{{ veiculo.preco }}" placeholder="Ex: 120000">
 
-        <label for="categoria">Categoria:</label>
-        <select id="categoria" name="categoria" class="form-control" required>
+        <label>Categorias</label>
+        <div class="categorias-box">
           {% for cat in categorias %}
-            <option value="{{ cat.id_categoria }}"
-              {% if veiculo and veiculo.id_categoria == cat.id_categoria %}selected{% endif %}>
+            <label class="cat-item">
+              <input 
+                  type="checkbox" 
+                  name="categorias[]" 
+                  value="{{ cat.id_categoria }}"
+                  {% if veiculo and cat.id_categoria in veiculo.categorias %}checked{% endif %}
+              >
               {{ cat.nome }}
-            </option>
+            </label>
           {% endfor %}
-        </select>
+        </div>
+
 
 
         <div class="buttons">

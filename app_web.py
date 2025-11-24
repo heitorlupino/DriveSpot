@@ -170,18 +170,8 @@ def adicionar_veiculo():
         ano = int(request.form['ano'])
         preco = float(request.form['preco'])
 
-        categoria_id = request.form.get('categoria')  
-
-        if not categoria_id:
-            categorias_selecionadas = request.form.getlist('categorias')
-            if categorias_selecionadas:
-                categoria_id = categorias_selecionadas[0]
-
-
-        if not categoria_id or categoria_id == "":
-            categoria_id = None
-        else:
-            categoria_id = int(categoria_id)
+        # pegar lista dos checkbox marcados
+        categorias = request.form.getlist("categorias[]")
 
         imagem = request.files.get('imagem')
         imagem_url = None
@@ -203,8 +193,13 @@ def adicionar_veiculo():
 
         try:
             cadastrar_veiculo(
-                id_usuario, id_marca, ano, modelo, preco,
-                imagem_url, categoria_id
+                id_usuario=id_usuario,
+                id_marca=id_marca,
+                ano=ano,
+                modelo=modelo,
+                preco=preco,
+                imagem_url=imagem_url,
+                categorias=categorias  # lista dos checkbox
             )
             flash("Veículo cadastrado com sucesso!", "adicionar")
         except Exception as e:
@@ -214,6 +209,8 @@ def adicionar_veiculo():
     
     categorias = buscar_categorias()
     return render_template('adicionar.html', categorias=categorias)
+
+
 
 def buscar_id_marca(nome_marca):
 
@@ -292,50 +289,71 @@ def editar():
             if not veiculo:
                 mensagem = "Nenhum veículo encontrado com esse modelo."
 
-        # --- SALVAR ALTERAÇÕES ---
+        # --- SALVAR ---
         elif "salvar" in request.form:
+
             id_veiculo = request.form.get("id_veiculo")
             modelo = request.form.get("modelo")
             marca = request.form.get("marca")
             ano = request.form.get("ano")
             preco = request.form.get("preco")
-            categoria_id = request.form.get("categoria")
 
-            # busca o carro atual para remover imagem antiga
-            veiculo = buscar_por_id(id_veiculo)
+            # lista de categorias selecionadas
+            categorias_selecionadas = request.form.getlist("categorias[]")
 
+            # buscar veículo atual
+            veiculo_atual = buscar_por_id(id_veiculo)
+            imagem_url = veiculo_atual["imagem_url"]
+
+            # --- IMAGEM ---
             nova_imagem = request.files.get("imagem")
-            imagem_url = veiculo["imagem_url"]
 
-            # --- TRATAR IMAGEM ---
             if nova_imagem and nova_imagem.filename != "":
                 if allowed_file(nova_imagem.filename):
 
-                    # APAGAR IMAGEM ANTIGA
-                    if veiculo["imagem_url"]:
+                    # apagar imagem antiga
+                    if veiculo_atual["imagem_url"]:
                         try:
-                            caminho_antigo = veiculo["imagem_url"].lstrip("/")
+                            caminho_antigo = veiculo_atual["imagem_url"].lstrip("/")
                             os.remove(os.path.join(app.root_path, caminho_antigo))
                         except:
                             pass
 
-                    # SALVAR NOVA
+                    # salvar nova
                     nome_arquivo = secure_filename(nova_imagem.filename)
                     caminho = os.path.join("static/img/carros", nome_arquivo)
                     nova_imagem.save(os.path.join(app.root_path, caminho))
-
                     imagem_url = "/" + caminho
 
-            # Atualizar no BD (novo parâmetro categoria)
+            # --- ATUALIZAR TABELA VEICULOS (sem categoria) ---
             atualizar_veiculo(
-                id_veiculo, modelo, marca, ano, preco, imagem_url, categoria_id
+                id_veiculo, modelo, marca, ano, preco, imagem_url
             )
 
-            mensagem = "Veículo atualizado com sucesso!"
+            # --- ATUALIZAR CATEGORIAS ---
+            conexao = obter_conexao()
+            cursor = conexao.cursor()
 
+            # apagar categorias antigas
+            cursor.execute(
+                "DELETE FROM veiculos_categorias WHERE id_veiculo = %s",
+                (id_veiculo,)
+            )
+
+            # inserir novas categorias
+            for cat_id in categorias_selecionadas:
+                cursor.execute(
+                    "INSERT INTO veiculos_categorias (id_veiculo, id_categoria) VALUES (%s, %s)",
+                    (id_veiculo, cat_id)
+                )
+
+            conexao.commit()
+            cursor.close()
+            conexao.close()
+
+            mensagem = "Veículo atualizado com sucesso!"
             veiculo = buscar_por_id(id_veiculo)
 
-    # Sempre buscar categorias para o SELECT no HTML
     categorias = buscar_categorias()
 
     return render_template(
@@ -344,7 +362,6 @@ def editar():
         mensagem=mensagem,
         categorias=categorias
     )
-
 
 @app.route('/relatorio', methods=['GET', 'POST'])
 @login_obrigatorio
@@ -387,25 +404,32 @@ def relatorio():
 @login_obrigatorio
 def carros_por_marca(marca):
 
-    modelo_filtro = request.args.get("modelo")  # ← Filtro opcional
+    modelo_filtro = request.args.get("modelo")
 
     try:
         conexao = obter_conexao()
         cursor = conexao.cursor(dictionary=True)
 
         sql = """
-            SELECT v.*, c.nome AS categoria
+            SELECT 
+                v.*, 
+                GROUP_CONCAT(c.nome SEPARATOR ', ') AS categorias
             FROM veiculos v
             JOIN marcas m ON v.id_marca = m.id_marca
-            LEFT JOIN categorias c ON v.id_categoria = c.id_categoria
+            LEFT JOIN veiculos_categorias vc ON vc.id_veiculo = v.id_veiculo
+            LEFT JOIN categorias c ON vc.id_categoria = c.id_categoria
             WHERE LOWER(m.nome) = LOWER(%s)
         """
 
         params = [marca]
 
+        # Filtro deve vir AQUI antes do GROUP BY
         if modelo_filtro:
             sql += " AND LOWER(v.modelo) LIKE LOWER(%s)"
             params.append(f"%{modelo_filtro}%")
+
+        # GROUP BY SEMPRE por último
+        sql += " GROUP BY v.id_veiculo"
 
         cursor.execute(sql, params)
         carros = cursor.fetchall()
@@ -422,6 +446,7 @@ def carros_por_marca(marca):
     finally:
         cursor.close()
         conexao.close()
+
 
 @app.before_request
 def limpar_sessao_em_rotas_especificas():
