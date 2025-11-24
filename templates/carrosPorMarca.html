@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carros - {{ marca }}</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styletelainicial.css') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/Logo-DriveSpot.ico') }}" type="image/x-icon">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="{{ url_for('static', filename='img/Logo_branco - DriveSpot.png') }}" alt="Logo - DriveSpot">
+            </a>
+        </div>
+
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+
+        <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Área da marca e busca -->
+    <section class="marca-area">
+        <div class="marca-info">
+            <span class="marca-nome">{{ marca }}</span>
+
+            <img src="{{ url_for('static', filename='img/logo_carros/' + marca|lower + '_logo.png') }}"
+                 class="marca-logo"
+                 alt="Logo {{ marca }}">
+        </div>
+
+        <form method="GET" action="{{ url_for('carros_por_marca', marca=marca) }}" class="search-form">
+            <div class="search-box">
+                <input type="text" name="modelo" placeholder="Buscar por modelo" value="{{ modelo or '' }}">
+                <button type="submit">🔍</button>
+            </div>
+        </form>
+
+    </section>
+
+    <!-- Fundo com logo gigante -->
+    <img src="{{ url_for('static', filename='img/logo_carros/' + marca|lower + '_logo.png') }}"
+         class="marca-fundo"
+         alt="Logo Fundo">
+
+    <!-- Exibição dos carros -->
+    <section class="car-section">
+        {% if carros %}
+            <div class="car-grid">
+                {% for carro in carros %}
+                    <div class="vehicle-card">
+
+                        <img src="{{ carro['imagem_url'] or url_for('static', filename='img/car_placeholder.png') }}">
+
+                        <h3>{{ carro['modelo'] }}</h3>
+                        <p>Ano: {{ carro['ano'] }}</p>
+                        <p>Preço: R${{ carro['preco'] }}</p>
+                        <p>Categoria: {{ carro['categorias'] or 'Sem categoria' }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>Nenhum carro encontrado para a marca {{ marca }}.</p>
+        {% endif %}
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Editar Veículo - DriveSpot</title>
+  <link rel="stylesheet" href="../static/css/styleeditar.css">
+  <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+<body>
+  <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+  <main class="container">
+    <div class="card">
+      <h1>Editar Veículo</h1>
+
+      <!-- FORM DE PESQUISA -->
+      <form method="POST" action="/editar" enctype="multipart/form-data">
+        <label for="pesquisa">Pesquisar veículo (digite o nome completo)</label>
+        <div class="search-box">
+          <input type="text" id="pesquisa" name="pesquisa" placeholder="Ex: Corolla"
+            value="{{ request.form.pesquisa if request.form.pesquisa else '' }}">
+          <button type="submit" class="search-btn" name="pesquisar" aria-label="Buscar">🔍</button>
+        </div>
+      </form>
+
+      {% if mensagem %}
+        <p class="mensagem">{{ mensagem }}</p>
+      {% endif %}
+
+      <!-- FORM PARA EDIÇÃO -->
+      {% if veiculo %}
+      <form id="editar" action="/editar" method="post">
+        <input type="hidden" name="id_veiculo" value="{{ veiculo.id_veiculo }}">
+
+        <label for="modelo">Modelo</label>
+        <input type="text" id="modelo" name="modelo" value="{{ veiculo.modelo }}" placeholder="Ex: Corolla">
+
+        <div class="form-row">
+          <div class="field">
+            <label for="marca">Marca</label>
+            <input type="text" id="marca" name="marca" value="{{ veiculo.marca }}" placeholder="Ex: Toyota">
+          </div>
+
+          <div class="field">
+            <label for="ano">Ano</label>
+            <input type="text" id="ano" name="ano" value="{{ veiculo.ano }}" placeholder="Ex: 2023">
+          </div>
+        </div>
+
+        <label for="preco">Preço</label>
+        <input type="text" id="preco" name="preco" value="{{ veiculo.preco }}" placeholder="Ex: 120000">
+
+        <label>Categorias</label>
+        <div class="categorias-box">
+          {% for cat in categorias %}
+            <label class="cat-item">
+              <input 
+                  type="checkbox" 
+                  name="categorias[]" 
+                  value="{{ cat.id_categoria }}"
+                  {% if veiculo and cat.id_categoria in veiculo.categorias %}checked{% endif %}
+              >
+              {{ cat.nome }}
+            </label>
+          {% endfor %}
+        </div>
+
+
+
+        <div class="buttons">
+          <button type="submit" name="salvar" class="btn">Salvar</button>
+          <button type="button" class="btn cancel" onclick="window.location.href='/'">Cancelar</button>
+        </div>
+      </form>
+      {% endif %}
+
+    </div>
+  </main>
+</body>
+</html>

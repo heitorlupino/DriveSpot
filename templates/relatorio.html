@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/styleRelatorio.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+    <title>Relatório de Veículos</title>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+    <div class="card">
+        <h1>Relatório de Veículos</h1>
+        <form action="/relatorio" method="post">
+
+            <label>Marca:</label>
+            <select name="marca">
+                <option value="">Todas</option>
+                {% for m in marcas %}
+                    <option value="{{ m }}">{{ m }}</option>
+                {% endfor %}
+            </select>
+
+            <div class="linha">
+                <div class="campo">
+                    <label>Ano mínimo</label>
+                    <input type="number" name="ano_min" placeholder="Ex: 2020">
+                </div>
+
+                <div class="campo">
+                    <label>Ano máximo</label>
+                    <input type="number" name="ano_max" placeholder="Ex: 2023">
+                </div>
+            </div>
+
+            <label>Preço máximo</label>
+            <input type="number" name="preco_max" placeholder="Ex: 120000">
+
+            <button type="submit" class="btn-gerar_relatorio">Gerar Relatório</button>
+        </form>
+
+        {% if dados %}
+        <div class="relatorio">
+            <h3>Resumo dos veículos</h3>
+            <p><strong>Total de veículos:</strong> {{ dados.total }}</p>
+            <p><strong>Média de preço:</strong> R$ {{ dados.media_preco }}</p>
+            <p><strong>Marca mais comum:</strong> {{ dados.marca_comum }}</p>
+            <p><strong>Ano mais frequente:</strong> {{ dados.ano_frequente }}</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Modelo</th>
+                        <th>Marca</th>
+                        <th>Ano</th>
+                        <th>Preço</th>
+                        <th>Categoria</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in dados.veiculos %}
+                    <tr>
+                        <td>{{ v.modelo }}</td>
+                        <td>{{ v.marca }}</td>
+                        <td>{{ v.ano }}</td>
+                        <td>R$ {{ v.preco }}</td>
+                        <td>{{ v.categorias or "Sem categoria" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</main>
+</div>
+
+</body>
+</html>

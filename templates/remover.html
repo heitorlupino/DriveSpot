@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remover Veículo - DriveSpot</title>
+  <link rel="stylesheet" href="../static/css/styleremover.css">
+  <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+
+<body>
+  <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+  <main class="container">
+    <div class="card">
+      <h1>Remover Veículo</h1>
+      
+      <form method="POST" action="/remover">
+        <input type="hidden" name="acao" value="pesquisar">
+
+        {% with messages = get_flashed_messages(category_filter=["remover"]) %}
+          {% if messages %}
+            {% for message in messages %}
+              <p class="alert">{{ message }}</p>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <label for="buscar">Selecione o veículo</label>
+        <div class="search-box">
+          <input type="text" name="pesquisa" id="buscar" placeholder="Buscar por modelo / marca / ano"
+            value="{{ pesquisa }}">
+          <button class="search-btn" type="submit">🔍</button>
+        </div>
+      </form>
+
+      {% if resultados %}
+      <div style="margin-top: 20px;">
+        <p><strong>Veículos encontrados: {{ resultados|length }}</strong></p>
+
+        <div class="resultado-grid">
+          {% for v in resultados %}
+          <form action="/confirmar-remocao/{{ v.id_veiculo }}" method="GET">
+            <button type="submit" class="btn resultado-btn">
+              {{ v.marca }} • {{ v.modelo }} • {{ v.ano }}
+            </button>
+          </form>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if pesquisa and not resultados %}
+      <p style="color: red; margin-top: 20px;">Nenhum veículo encontrado.</p>
+      {% endif %}
+
+      <div class="buttons">
+        <button class="btn cancelAction">
+          <a href="/telaInicial">Cancelar</a>
+        </button>
+      </div>
+    </div>
+  </main>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveSpot - Dashboard</title>
+    <link rel="stylesheet" href="../static/css/styletelainicial.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Imagem principal -->
+    <section class="banner">
+        <img src="../static/img/Tela_de_fundo_DriveSpot.png" alt="Imagem de carros">
+    </section>
+
+    <!-- Campo de busca -->
+    <div class="container">
+        <form method="POST" action="/telaInicial" class="search-form">
+            <div class="search-box">
+                <input type="text" id="pesquisa" name="pesquisa" placeholder="Ex: Corolla"
+                    value="{{ request.form.pesquisa if request.form.pesquisa else '' }}">
+                <button type="submit" class="search-btn" name="pesquisar" aria-label="Buscar">🔍</button>
+            </div>
+        </form>
+    </div>
+
+<!-- Cards de carros -->
+<section class="car-section">
+    <h2>Marcas</h2>
+    <div class="car-grid">
+        <div class="car-card">
+            <a href="{{ url_for('carros_por_marca', marca='Toyota') }}">
+                <img src="/static/img/logo_carros/toyota_logo.png" alt="Toyota">
+            </a>
+        </div>
+
+        <div class="car-card">
+            <a href="{{ url_for('carros_por_marca', marca='Chevrolet') }}">
+                <img src="/static/img/logo_carros/chevrolet_logo.png" alt="Chevrolet">
+            </a>
+        </div>
+
+        <div class="car-card">
+            <a href="{{ url_for('carros_por_marca', marca='Volkswagen') }}">
+                <img src="/static/img/logo_carros/volkswagen_logo.png" alt="Volkswagen">
+            </a>
+        </div>
+
+        <div class="car-card">
+            <a href="{{ url_for('carros_por_marca', marca='Hyundai') }}">
+                <img src="/static/img/logo_carros/hyundai_logo.png" alt="Hyundai">
+            </a>
+        </div>
+
+        <div class="car-card">
+            <a href="{{ url_for('carros_por_marca', marca='Honda') }}">
+                <img src="/static/img/logo_carros/honda_logo.png" alt="Honda">
+            </a>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

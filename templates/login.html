@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveSpot - Login</title>
+    <link rel="stylesheet" href="../static/css/stylelogin.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+
+        <h2>Login</h2>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="alerta">
+                    {% for msg in messages %}
+                        <p>{{ msg }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+
+        <form method="post">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+
+            <p class="register-text">
+                Não tem uma conta? 
+                <a href="/cadastro" class="register-link">Registre-se</a>
+            </p>
+
+            <button type="submit">Entrar</button>
+        </form>
+    </div>
+</body>
+</html>

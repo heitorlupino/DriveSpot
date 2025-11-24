@@ -1,0 +1,163 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.navbar{
+    background-color: #1D18B1;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 40px;
+}
+
+.logo{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.logo img{
+    width: 150px;
+    height: auto;
+}
+
+nav a{
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 40px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+nav a:hover,
+nav a:focus{
+    background-color: #15158C;
+    text-decoration: 2px underline;
+}
+
+.perfil a{
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 40px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+.perfil a:hover{
+    background-color: #15158C;
+    text-decoration: 2px underline;
+}
+
+body{
+    background-color: #E0E0E0;
+}
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100vh - 70px);
+}
+
+.card{
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 10px;
+    width: 1000px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card h1{
+    color: #1D18B1;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.alert {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+    padding: 10px 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    text-align: center;
+}
+
+
+form{
+    display: flex;
+    flex-direction: column;
+}
+
+label{
+    font-weight: 500;
+    margin: 10px 0
+}
+
+input{
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    outline: none;
+    font-size: 16px;
+}
+
+input:focus{
+    border-color: #1D18B1;
+}
+
+.linha{
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.campo{
+    flex: 1;
+    margin-bottom: 10px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px; 
+    margin-top: 10px;
+}
+
+
+
+.campo input{
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.btn-salvar{
+    background-color: #1D18B1;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 6px;
+    margin: 30px auto 0 auto;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 20px;
+    transition: 0.3s;
+    width: 200px;
+}
+
+.btn-salvar:hover{
+    background-color: #15158C;
+}

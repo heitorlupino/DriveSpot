@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - DriveSpot</title>
+    <link rel="stylesheet" href="../static/css/stylecadastro.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+</head>
+<body>
+    <button class="btn-voltar" onclick="window.location.href='/'">Voltar</button>
+
+    <div class="cadastro-container">
+        <div class="logo">
+            <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo DriveSpot">
+        </div>
+
+        <h2>Cadastro</h2>
+
+        <form method="post">
+            <input type="text" name="nome" placeholder="Nome Completo" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="email" name="confirmar_email" placeholder="Confirme seu email" required>
+            <input type="password" name="senha" placeholder="Senha" required>
+            <input type="password" name="confirmar_senha" placeholder="Confirme sua senha" required>
+
+            <div class="botoes">
+                <button type="button" class="cancelar">Cancelar</button>
+                <button type="submit" class="salvar">Salvar Informações</button>
+            </div>
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class="mensagem">
+                    {% for msg in messages %}
+                        <li>{{ msg }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="shortcut icon" href="../static/img/Logo-DriveSpot.ico" type="image/x-icon">
+    <title>Adicionar Veículo</title>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="/telaInicial">
+                <img src="../static/img/Logo_branco - DriveSpot.png" alt="Logo - DriveSpot">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <a href="/adicionar">Adicionar</a>
+            <a href="/editar">Editar</a>
+            <a href="/remover">Remover</a>
+            <a href="/relatorio">Relatório</a>
+        </ul>
+       <div class="perfil">
+            {% if session.usuario %}
+                <span class="usuario-nome">👤 Olá, {{ session.usuario.nome }}</span>
+                <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-login">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="card">
+            <h1>Adicionar Veículo</h1>
+            {% with messages = get_flashed_messages(category_filter=["adicionar"]) %}
+                {% if messages %}
+                    <div class="alert">
+                        {% for message in messages %}
+                            {{ message }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <form action="/adicionar" method="post" enctype="multipart/form-data">
+                <label>Modelo</label>
+                <input type="text" name="modelo" placeholder="Ex: Corolla" required>
+
+                <div class="linha">
+                    <div class="campo">
+                        <label>Marca</label>
+                        <input type="text" name="marca" placeholder="Ex: Toyota" required>
+                    </div>
+
+                    <div class="campo">
+                        <label>Ano</label>
+                        <input type="number" name="ano" placeholder="Ex: 2023" required>
+                    </div>
+                </div>
+
+                <label>Preço</label>
+                <input type="number" name="preco" placeholder="Ex: 120000" required>
+                
+                <label>Categorias</label>
+                <div class="categorias-box">
+                    {% for cat in categorias %}
+                        <label class="cat-item">
+                            <input type="checkbox" name="categorias[]" value="{{ cat.id_categoria }}">
+                            {{ cat.nome }}
+                        </label>
+                    {% endfor %}
+                </div>
+
+
+                <label for="imagem">Imagem do veículo (opcional)</label>
+                <input type="file" id="imagem" name="imagem" accept="image/*">
+
+                <button type="submit" class="btn-salvar">Salvar</button>
+
+            </form>
+        </div>
+    </main>
+</body>
+</html> 
